@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --radius-glass: 1.25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    height: 100%;
+  }
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply font-sans antialiased transition-colors duration-300;
+  }
+}
