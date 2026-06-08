@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { History } from 'lucide-react';
 
 export function Credit() {

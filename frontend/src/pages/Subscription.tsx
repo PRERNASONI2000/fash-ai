@@ -1,5 +1,5 @@
 //subscription.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Sparkles, FileText, ChevronDown } from 'lucide-react';
 

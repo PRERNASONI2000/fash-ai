@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
@@ -134,7 +135,7 @@ const RECENT_WORK: RecentItem[] = [
 ];
 
 // ─── Animation variants ────────────────────────────────────────────────────────
-const fadeUp = {
+const fadeUp : Variants = {
   hidden: { opacity: 0, y: 22 },
   visible: (i: number) => ({
     opacity: 1,
