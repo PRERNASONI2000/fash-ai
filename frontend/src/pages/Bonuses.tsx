@@ -47,67 +47,59 @@ export function Bonuses() {
   }, [])
 
   if (loading) return (
-    <div className="flex justify-center items-center min-h-40 text-zinc-500 animate-pulse">
-      <Sparkles className="mr-2 h-5 w-5 animate-spin" /> Loading bonuses...
+    <div className="flex justify-center items-center min-h-40 text-zinc-500">
+      <Sparkles className="mr-2 h-4 w-4 animate-spin text-violet-500" />
+      <span className="text-sm animate-pulse">Loading bonuses…</span>
     </div>
   )
 
   if (error) return (
-    <div className="flex justify-center items-center min-h-40 text-red-500 bg-red-500/10 rounded-xl p-4">
-      {error}
+    <div className="flex justify-center items-center min-h-40">
+      <div className="rounded-xl border border-red-500/20 bg-red-50 dark:bg-red-500/10 px-6 py-4 text-sm text-red-600 dark:text-red-400">{error}</div>
     </div>
   )
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      {/* Header Section */}
-      <div className="mb-10 text-center md:text-left">
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-          Exclusive Bonuses
-        </h1>
-        <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">Exclusive Bonuses</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Download premium resources and boost your projects.
         </p>
       </div>
 
-      {/* Grid Layout */}
       {bonuses.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-500">
+        <div className="text-center py-16 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-2xl text-sm text-zinc-500">
           No bonuses available right now. Check back later!
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {bonuses.map(bonus => (
             <div
               key={bonus._id}
-              className="group relative flex flex-col rounded-2xl border border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.03] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 dark:hover:shadow-black/30 hover:-translate-y-1"
+              className="group flex flex-col rounded-2xl border border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#17171b] overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-zinc-900/8 dark:hover:shadow-black/30 hover:-translate-y-1"
             >
-              {/* Image Section with Hover Zoom */}
-              <div className="relative h-52 w-full overflow-hidden">
+              <div className="relative h-52 w-full overflow-hidden bg-zinc-100 dark:bg-white/[0.04]">
                 <img
                   src={bonus.imageUrl}
                   alt={bonus.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {/* Dark gradient overlay at the bottom of image */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
 
-              {/* Content Section */}
-              <div className="p-5 flex flex-col flex-1 bg-gradient-to-b from-transparent to-zinc-50/50 dark:to-white/[0.02]">
-                <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4 text-center">
+              <div className="p-5 flex flex-col flex-1">
+                <h2 className="text-base font-semibold text-zinc-900 dark:text-white mb-4">
                   {bonus.name}
                 </h2>
-
-                {/* Download Button - Fixed syntax and added gradient + glow */}
                 <a
                   href={bonus.downloadLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-4 py-3 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-violet-500/25 active:scale-95"
+                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 text-white dark:text-black px-4 py-2.5 text-sm font-semibold transition-all shadow-sm active:scale-95"
                 >
-                  <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
-                  Download Now
+                  <Download className="h-4 w-4" />
+                  Download
                 </a>
               </div>
             </div>

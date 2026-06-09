@@ -131,83 +131,89 @@ export function Profile() {
   const avatarLetter = email?.trim()?.charAt(0)?.toUpperCase() || 'U';
 
   return (
-    <div className="max-w-2xl mx-auto py-8 text-white">
+    <div className="max-w-2xl mx-auto py-8 px-4 text-zinc-900 dark:text-white">
       {isLoading ? (
         <div className="flex min-h-[280px] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-blue-500" />
+          <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-zinc-200 dark:border-white/10 border-t-violet-500" />
         </div>
       ) : (
         <>
           <div className="flex flex-col items-center mb-8">
-            <div className="w-24 h-24 rounded-full bg-blue-500 flex items-center justify-center mb-3">
-              <span className="text-4xl font-bold text-white">{avatarLetter}</span>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center mb-3 shadow-md shadow-violet-500/25">
+              <span className="text-3xl font-bold text-white">{avatarLetter}</span>
             </div>
-            <p className="text-xs text-zinc-400 font-medium">Your profile avatar is based on your email</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Profile avatar based on your email</p>
           </div>
 
-          <div className="space-y-6">
-            {error && <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
-            {success && <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-100">{success}</div>}
+          <div className="space-y-4">
+            {error && <div className="rounded-xl border border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">{error}</div>}
+            {success && <div className="rounded-xl border border-green-500/20 bg-green-50 dark:bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-300">{success}</div>}
 
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1 ml-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                readOnly
-                className="w-full bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none"
-              />
+            <div className="rounded-2xl border border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#17171b] p-6 shadow-sm space-y-4">
+              <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Personal Info</h3>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  readOnly
+                  className="w-full bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.07] rounded-xl px-4 py-2.5 text-sm text-zinc-400 dark:text-zinc-500 focus:outline-none cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-300 mb-1.5">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.07] rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="w-full bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 text-white dark:text-black font-semibold py-2.5 rounded-xl transition-colors shadow-sm text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
 
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1 ml-1">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-500"
-              />
+            <div className="rounded-2xl border border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#17171b] p-6 shadow-sm space-y-3">
+              <h3 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Account</h3>
+
+              <button
+                type="button"
+                onClick={handleManageSubscription}
+                className="w-full flex items-center justify-between bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.07] hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-100 dark:hover:bg-white/[0.07] text-zinc-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-sm"
+              >
+                Manage Subscription
+                <span className="text-zinc-400 text-base">→</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center justify-between bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.07] hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-100 dark:hover:bg-white/[0.07] text-zinc-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-sm"
+              >
+                Sign Out
+                <span className="text-zinc-400 text-base">→</span>
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? 'Saving...' : 'Save'}
-            </button>
-
-            <div className="mt-10 space-y-4">
-              <div>
-                <h3 className="text-sm font-medium mb-3">Account</h3>
-
-                <button
-                  type="button"
-                  onClick={handleManageSubscription}
-                  className="w-full bg-zinc-100 dark:bg-[#18181b] border border-zinc-200 dark:border-white/10 hover:bg-zinc-200 dark:hover:border-white/20 text-zinc-900 dark:text-white font-medium py-3 rounded-lg transition-colors"
-                >
-                  Manage Subscription
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full bg-zinc-100 dark:bg-[#18181b] border border-zinc-200 dark:border-white/10 hover:bg-zinc-200 dark:hover:border-white/20 text-zinc-900 dark:text-white font-medium py-3 my-3 rounded-lg transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium mb-3">Danger Zone</h3>
-                <button
-                  type="button"
-                  onClick={openDeleteModal}
-                  disabled={isDeleting}
-                  className="w-full bg-[#b91c1c] hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isDeleting ? 'Deleting account...' : 'Delete My Account And Data'}
-                </button>
-              </div>
+            <div className="rounded-2xl border border-red-200 dark:border-red-500/20 bg-red-50/60 dark:bg-red-500/[0.04] p-6 shadow-sm">
+              <h3 className="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-widest mb-2">Danger Zone</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">Permanently delete your account and all associated data. This cannot be undone.</p>
+              <button
+                type="button"
+                onClick={openDeleteModal}
+                disabled={isDeleting}
+                className="w-full border border-red-300 dark:border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/10 font-semibold py-2.5 rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? 'Deleting account...' : 'Delete My Account'}
+              </button>
             </div>
           </div>
 

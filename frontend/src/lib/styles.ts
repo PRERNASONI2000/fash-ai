@@ -1,5 +1,5 @@
 const glass =
-  'rounded-2xl border border-zinc-900/10 bg-white/70 shadow-lg shadow-zinc-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06] dark:shadow-black/40'
+  'rounded-2xl border border-zinc-200 bg-white shadow-sm shadow-zinc-900/5 dark:border-white/[0.07] dark:bg-[#17171b] dark:shadow-black/30'
 
 export function glassPanel(extra?: string) {
   return [glass, extra].filter(Boolean).join(' ')

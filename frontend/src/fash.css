@@ -8,21 +8,21 @@
 
 /* ── CSS Custom Properties ─────────────────────────────────── */
 :root {
-  --fash-bg: #f2eee6;
+  --fash-bg: #f4f4f6;
   --fash-surface: #ffffff;
-  --fash-surface-2: #faf9f7;
-  --fash-border: rgba(0, 0, 0, 0.08);
-  --fash-text-primary: #1c1917;
-  --fash-text-secondary: #57534e;
-  --fash-text-muted: #a8a29e;
+  --fash-surface-2: #f9f9fb;
+  --fash-border: rgba(0, 0, 0, 0.07);
+  --fash-text-primary: #111114;
+  --fash-text-secondary: #52525b;
+  --fash-text-muted: #a1a1aa;
 
   /* Sidebar */
   --fash-sidebar-bg: #ffffff;
   --fash-sidebar-border: rgba(0, 0, 0, 0.07);
 
   /* Navbar */
-  --fash-navbar-bg: rgba(255, 255, 255, 0.85);
-  --fash-navbar-border: rgba(0, 0, 0, 0.07);
+  --fash-navbar-bg: rgba(255, 255, 255, 0.9);
+  --fash-navbar-border: rgba(0, 0, 0, 0.06);
 
   /* Accent */
   --fash-accent: #b5652a;
@@ -50,19 +50,19 @@
 
 /* Dark mode overrides */
 .dark {
-  --fash-bg: #121212;
-  --fash-surface: #1e1e1e;
-  --fash-surface-2: #252525;
-  --fash-border: rgba(255, 255, 255, 0.08);
-  --fash-text-primary: #f5f5f4;
-  --fash-text-secondary: #a8a29e;
-  --fash-text-muted: #78716c;
+  --fash-bg: #0d0d10;
+  --fash-surface: #17171b;
+  --fash-surface-2: #1d1d22;
+  --fash-border: rgba(255, 255, 255, 0.07);
+  --fash-text-primary: #f0f0f3;
+  --fash-text-secondary: #a1a1aa;
+  --fash-text-muted: #71717a;
 
-  --fash-sidebar-bg: #181818;
-  --fash-sidebar-border: rgba(255, 255, 255, 0.07);
+  --fash-sidebar-bg: #111115;
+  --fash-sidebar-border: rgba(255, 255, 255, 0.06);
 
-  --fash-navbar-bg: rgba(18, 18, 18, 0.92);
-  --fash-navbar-border: rgba(255, 255, 255, 0.07);
+  --fash-navbar-bg: rgba(13, 13, 16, 0.94);
+  --fash-navbar-border: rgba(255, 255, 255, 0.06);
 
   --fash-accent: #d97a40;
   --fash-accent-dark: #f59e67;
@@ -70,9 +70,9 @@
   --fash-teal: #2dd4bf;
   --fash-teal-light: rgba(13, 148, 136, 0.18);
 
-  --fash-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
-  --fash-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --fash-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --fash-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --fash-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --fash-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
 }
 
 /* ── Global Reset/Body ─────────────────────────────────────── */
@@ -120,7 +120,7 @@ body {
 .fash-sidebar {
   background-color: var(--fash-sidebar-bg);
   border-right: 1px solid var(--fash-sidebar-border);
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 1px 0 0 var(--fash-sidebar-border), 2px 0 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   width: 240px;
@@ -174,6 +174,17 @@ body {
   background: var(--fash-border);
 }
 
+/* Nav group label */
+.fash-nav-group-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fash-text-muted);
+  padding: 0 12px;
+  margin-bottom: 4px;
+}
+
 /* Nav items */
 .fash-nav-item {
   display: flex;
@@ -201,17 +212,21 @@ body {
   background-color: var(--fash-accent-light);
   color: var(--fash-accent);
   font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--fash-accent);
 }
 
 .dark .fash-nav-active {
-  background-color: rgba(181, 101, 42, 0.15);
+  background-color: rgba(181, 101, 42, 0.12);
   color: var(--fash-accent);
+  box-shadow: inset 3px 0 0 var(--fash-accent);
 }
 
 .fash-sidebar-footer {
   padding: 14px 16px;
   border-top: 1px solid var(--fash-border);
   font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--fash-text-muted);
 }
 
@@ -225,12 +240,13 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 0 24px;
-  height: 62px;
+  height: 60px;
   flex-shrink: 0;
   background-color: var(--fash-navbar-bg);
   border-bottom: 1px solid var(--fash-navbar-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 0 var(--fash-navbar-border), 0 2px 8px rgba(0,0,0,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transition: background-color 0.3s var(--fash-ease);
 }
 
@@ -483,11 +499,11 @@ body {
   grid-template-columns: 1fr auto;
   gap: 24px;
   align-items: start;
-  background: linear-gradient(135deg, #ffffff 0%, #fdf9f5 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #fafafc 100%);
   border: 1px solid var(--fash-border);
   border-radius: var(--fash-radius-xl);
   padding: 32px 36px;
-  box-shadow: var(--fash-shadow-sm);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
   position: relative;
   overflow: hidden;
 }
@@ -504,7 +520,7 @@ body {
 }
 
 .dark .fash-welcome {
-  background: linear-gradient(135deg, #1e1e1e 0%, #222 100%);
+  background: linear-gradient(135deg, #17171b 0%, #1d1d22 100%);
 }
 
 .fash-welcome-left {
@@ -747,10 +763,10 @@ body {
 }
 
 .fash-section-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--fash-text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 0 0 4px;
 }
 
