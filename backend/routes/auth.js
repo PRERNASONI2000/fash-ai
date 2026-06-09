@@ -46,7 +46,7 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     const payload = { user: { id: user.id } };
-    jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '5h' }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5h' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid Credentials' });
 
     const payload = { user: { id: user.id } };
-    jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '5h' }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5h' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => {
 // Get Current User Profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password -resetPasswordToken');
+    const user = await User.findById(req.user.id).select('-password -resetPasswordToken -resetPasswordExpire');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -148,7 +148,7 @@ router.post('/logout', auth, async (req, res) => {
 });
 
 // Forgot Password
-router.post('/forgot-password', auth, async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -162,9 +162,9 @@ router.post('/forgot-password', auth, async (req, res) => {
     }
 
 
-    const user = await User.findById(req.user.id);
-    if (!user || user.email !== email) {
-      return res.status(400).json({ message: 'Please enter your registered email address' });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.json({ message: 'If that email exists, a reset link was sent.' });
     }
 
 
@@ -276,13 +276,15 @@ router.post('/google', async (req, res) => {
         profilePicture: picture || ''
       });
       await user.save();
+    } else if (!user.googleId) {
+      return res.status(400).json({ message: 'This email is registered with email/password. Please sign in normally.' });
     }
 
     // Apna JWT banao
     const payload = { user: { id: user.id } };
     jwt.sign(
       payload,
-      process.env.JWT_SECRET || 'secret',
+      process.env.JWT_SECRET,
       { expiresIn: '5h' },
       (err, token) => {
         if (err) throw err;
