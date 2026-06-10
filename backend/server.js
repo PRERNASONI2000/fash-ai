@@ -22,7 +22,7 @@ const KIE_BASE64_UPLOAD_URL = 'https://kieai.redpandaai.co/api/file-base64-uploa
 //everthing should add after this (connections)
 app.use(cors())
 //add below
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '15mb' }))
 connectDB();
 app.use('/api/bonuses', bonusRoutes)
 app.use('/api/trainings', trainingRoutes)

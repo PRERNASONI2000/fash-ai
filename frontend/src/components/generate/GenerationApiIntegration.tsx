@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState, type SVGProps } from 'react'
 import { glassPanel } from '../../lib/styles'
 import type { GenerationPayload, GenerateApiEnvelope, StatusApiEnvelope } from '../../types/generation'
 
-const API_GENERATE = 'http://localhost:5000/api/generate'
-const API_UPLOAD_IMAGE = 'http://localhost:5000/api/upload-image'
-const API_STATUS = (taskId: string) => `http://localhost:5000/api/status/${encodeURIComponent(taskId)}`
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:5000'
+const API_GENERATE = `${BASE_URL}/api/generate`
+const API_UPLOAD_IMAGE = `${BASE_URL}/api/upload-image`
+const API_STATUS = (taskId: string) => `${BASE_URL}/api/status/${encodeURIComponent(taskId)}`
 const POLL_MS = 5000
 
 async function blobUrlToDataUrl(blobUrl: string): Promise<string> {
