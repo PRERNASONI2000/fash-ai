@@ -1,5 +1,8 @@
 //server.js
 require('dotenv').config()
+const { Fashn } = require('fashn');
+// Initialize Fashn
+const fashnClient = new Fashn({ apiKey: process.env.FASHN_API_KEY });
 const mongoose = require('mongoose');
 
 //bonuse connnection uses
@@ -7,6 +10,7 @@ const connectDB = require('./db');
 const bonusRoutes = require('./routes/bonuses');
 //trainings connection uses
 const trainingRoutes = require('./routes/trainings');
+const fashnRoutes = require('./routes/fashn');
 
 const express = require('express')
 const cors = require('cors')
@@ -15,23 +19,23 @@ const axios = require('axios')
 const app = express()
 const PORT = Number(process.env.PORT) || 5000
 
-const KIE_GENERATE_URL = 'https://api.kie.ai/api/v1/veo/generate'
-const KIE_RECORD_INFO_BASE = 'https://api.kie.ai/api/v1/veo/record-info'
-const KIE_BASE64_UPLOAD_URL = 'https://kieai.redpandaai.co/api/file-base64-upload'
 
 //everthing should add after this (connections)
 app.use(cors())
-//add below
-app.use(express.json({ limit: '2mb' }))
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
+app.use(express.json({ limit: '50mb' }))
 connectDB();
 app.use('/api/bonuses', bonusRoutes)
 app.use('/api/trainings', trainingRoutes)
 app.use('/api/auth', require('./routes/auth'))
+app.use('/api/plans', require('./routes/plans'))
+app.use('/api/payments', require('./routes/payments'))
+app.use('/api/fashn', require('./routes/fashn')) // Fashn related routes (try-on, product-to-model, etc.)
 
 
 function kieHeaders(extra = {}) {
   const headers = {
-    'Authorization': `Bearer ${process.env.KIE_API_KEY}`,
+    'Authorization': `Bearer ${process.env.FASHN_API_KEY}`,
     'Content-Type': 'application/json',
     ...extra,
   }
@@ -62,83 +66,35 @@ function sendAxiosError(res, err) {
   })
 }
 
-app.post('/api/generate', async (req, res) => {
-  try {
-    const response = await axios.post(KIE_GENERATE_URL, req.body, {
-      headers: kieHeaders(),
-      validateStatus: () => true,
-    })
-    return res.status(response.status).json(response.data)
-  } catch (err) {
-    return sendAxiosError(res, err)
+app.post('/api/fashn-tryon', async (req, res) => {
+  const { modelImage, garmentImage } = req.body;
+
+  if (!modelImage || !garmentImage) {
+    return res.status(400).json({ error: true, message: 'Both modelImage and garmentImage are required' });
   }
-})
 
-app.get('/api/status/:taskId', async (req, res) => {
-  const { taskId } = req.params
-  if (!taskId || !String(taskId).trim()) {
-    return res.status(400).json({ error: true, message: 'taskId is required' })
-  }
-  const url = `${KIE_RECORD_INFO_BASE}?taskId=${encodeURIComponent(taskId)}`
   try {
-    const response = await axios.get(url, {
-      headers: kieHeaders(),
-      validateStatus: () => true,
-    })
-    return res.status(response.status).json(response.data)
-  } catch (err) {
-    return sendAxiosError(res, err)
-  }
-})
-
-app.post('/api/upload-image', async (req, res) => {
-  try {
-    const base64Image = req.body?.base64Image
-    if (!base64Image || typeof base64Image !== 'string' || !String(base64Image).trim()) {
-      return res.status(400).json({ error: true, message: 'base64Image is required' })
-    }
-
-    const upstreamPayload = {
-      base64Data: String(base64Image).trim(),
-      uploadPath: 'images/upload',
-    }
-
-    const response = await axios.post(KIE_BASE64_UPLOAD_URL, upstreamPayload, {
-      headers: {
-        Authorization: 'Bearer ' + process.env.KIE_API_KEY,
-        'Content-Type': 'application/json',
+    const response = await fashnClient.predictions.subscribe({
+      model_name: "tryon-v1.6",
+      inputs: {
+        model_image: modelImage,
+        garment_image: garmentImage,
       },
-      validateStatus: () => true,
-    })
+    });
 
-    const body = response.data
-    const hostedUrl =
-      body?.data?.downloadUrl ||
-      body?.data?.url ||
-      body?.downloadUrl ||
-      body?.url
-
-    if (response.status >= 400 || body?.success === false || (body?.code != null && body.code !== 200)) {
-      return res.status(response.status >= 400 ? response.status : 502).json({
-        error: true,
-        message: typeof body?.msg === 'string' ? body.msg : 'Image upload failed',
-        upstream: body,
-      })
+    if (response.status !== "completed") {
+      return res.status(400).json({ error: true, message: response.error?.message || "Generation failed" });
     }
 
-    if (!hostedUrl || typeof hostedUrl !== 'string') {
-      return res.status(502).json({
-        error: true,
-        message: 'Upload response did not include a hosted image URL',
-        upstream: body,
-      })
-    }
-
-    return res.json({ imageUrl: hostedUrl })
-  } catch (err) {
-    return sendAxiosError(res, err)
+    return res.json({ output: response.output?.at(0) });
+  } catch (error) {
+    console.error("Fashn API Error:", error);
+    return res.status(500).json({ error: true, message: "Internal server error during Fashn generation" });
   }
-})
+});
+
+
+
 
 app.use((req, res) => {
   res.status(404).json({ error: true, message: 'Not found' })

@@ -3,6 +3,7 @@ node_modules/
 npm-debug.log
 
 # Environment variables
+#Add .env.local to your .gitignore to prevent accidentally committing secrets
 .env
 .env.local
 

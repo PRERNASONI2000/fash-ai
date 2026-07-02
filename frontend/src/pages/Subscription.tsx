@@ -1,50 +1,43 @@
 //subscription.tsx
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { Shield, Sparkles, FileText, ChevronDown } from 'lucide-react';
+import { useUserData } from '../hooks/useUserData';
+import { useFetch } from '../hooks/useFetch';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+interface Plan {
+  _id: string;
+  name: string;
+  type: 'plan' | 'addon';
+  credits: number;
+  price: number;
+  recurring: boolean;
+  billingCycle?: string;
+  features?: string[];
+}
+
+interface PlansResponse {
+  plans: Plan[];
+  addons: Plan[];
+}
 
 export function Subscription() {
-  const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { userData, isLoading, error } = useUserData();
+  const { data: plansData, loading: plansLoading, error: plansError } = useFetch<PlansResponse>(`${API_URL}/api/plans`);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const response = await fetch('http://localhost:5000/api/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || 'Failed to load profile');
-        }
-        setName(data.name || '');
-      } catch (err: any) {
-        setError(err.message || 'Unable to load profile');
-        navigate('/login', { replace: true });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [navigate]);
-
+  const name = userData.name;
   const avatarLetter = name?.trim()?.charAt(0)?.toUpperCase() || 'U';
   const workspaceName = name ? `${name}'s Workspace` : 'My Workspace';
+  const currentPlanName = userData.activePlan?.name?.replace('Fashion Studio ', '') || 'Free';
+  const creditsLeft = userData.credits ?? 0;
+  const creditsTotal = userData.activePlan?.credits || creditsLeft || 0;
+  const addonCreditsTotal = userData.purchasedAddons?.reduce((sum, addon) => sum + (addon.credits || 0), 0) ?? 0;
 
   const getPrice = (monthlyPrice: number) => {
     if (isAnnual) {
@@ -52,6 +45,50 @@ export function Subscription() {
     }
     return monthlyPrice.toString();
   };
+
+  const getPlanLabel = (plan: Plan) => plan.name.replace('Fashion Studio ', '');
+
+  const getPlanCreditsLabel = (plan: Plan) => {
+    if (plan.features?.[0]) return plan.features[0];
+    if (plan.credits > 0) {
+      return plan.recurring ? `${plan.credits} credits/month` : `${plan.credits} credits`;
+    }
+    return plan.features?.join(', ') || '';
+  };
+
+  const getAddonCreditsLabel = (plan: Plan) => {
+    if (plan.features?.[0]) return plan.features[0];
+    return plan.credits > 0 ? `${plan.credits} credits` : '';
+  };
+
+  const plans = plansData?.plans ?? [];
+  const addons = plansData?.addons ?? [];
+
+  const handleSubscribe = async (planId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ planId }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to start checkout');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error('Checkout redirect error:', err);
+    }
+  };
+
 
   const faqData = [
     {
@@ -72,18 +109,18 @@ export function Subscription() {
     // },
   ];
 
-  if (isLoading) {
+  if (isLoading || plansLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#050506]">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 dark:border-white/10 border-t-blue-500" />
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 dark:border-white/10 border-t-[#d97a40]" />
       </div>
     );
   }
 
-  if (error) {
+  if (error || plansError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#050506]">
-        <div className="text-red-400">{error}</div>
+        <div className="text-red-400">{error || plansError}</div>
       </div>
     );
   }
@@ -92,7 +129,7 @@ export function Subscription() {
     <div className="min-h-screen text-zinc-900 dark:text-white px-6 py-12">
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#b5652a] to-[#d97a40] text-xl font-bold text-white shadow-[0_4px_16px_rgba(181,101,42,0.35)]">
             {avatarLetter}
           </div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">{workspaceName}</h1>
@@ -106,12 +143,12 @@ export function Subscription() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="border border-zinc-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#18181b] p-5 md:col-span-2">
               <p className="text-xs text-zinc-400 mb-3">Current Plan</p>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-white mb-8">Free</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white mb-8">{currentPlanName}</p>
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => setShowUpgradeModal(true)}
-                  className="bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg px-4 py-2 text-sm font-semibold transition hover:bg-zinc-800 dark:hover:bg-zinc-100"
+                  className="bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white rounded-lg px-4 py-2 text-sm font-semibold transition shadow-[0_2px_10px_rgba(181,101,42,0.3)]"
                 >
                   Upgrade Plan
                 </button>
@@ -120,13 +157,13 @@ export function Subscription() {
 
             <div className="border border-zinc-200 dark:border-white/10 rounded-xl bg-zinc-50 dark:bg-[#111] p-5">
               <p className="text-xs text-zinc-400 mb-2">Additional Credits Pack</p>
-              <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">0</p>
+              <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">{addonCreditsTotal}</p>
               <p className="text-xs text-zinc-400 mb-8">$15/Pack/month</p>
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={() => setShowUpgradeModal(true)}
-                  className="bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg px-3 py-2 text-xs font-semibold transition hover:bg-zinc-800 dark:hover:bg-zinc-100"
+                  className="bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white rounded-lg px-3 py-2 text-xs font-semibold transition shadow-[0_2px_8px_rgba(181,101,42,0.25)]"
                 >
                   Upgrade To Advanced To Unlock
                 </button>
@@ -149,13 +186,13 @@ export function Subscription() {
             </div>
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-zinc-900 dark:text-white">40</span>
-                <span className="text-xl text-zinc-400">/40</span>
+                <span className="text-4xl font-bold text-zinc-900 dark:text-white">{creditsLeft}</span>
+                <span className="text-xl text-zinc-400">/{creditsTotal}</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowUpgradeModal(true)}
-                className="bg-white text-black rounded-lg px-4 py-2 text-sm font-semibold transition hover:bg-zinc-100"
+                className="bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white rounded-lg px-4 py-2 text-sm font-semibold transition shadow-[0_2px_10px_rgba(181,101,42,0.25)]"
               >
                 + Add Credits
               </button>
@@ -228,55 +265,52 @@ export function Subscription() {
             {/* Plans Grid */}
             <div className="border-b border-zinc-200 dark:border-white/10 p-8">
               <div className="grid gap-6 grid-cols-4">
-                {/* Essential */}
-                <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6">
-                  <p className="text-sm font-semibold text-zinc-400 mb-4">Essential</p>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">${getPrice(7)}<span className="text-lg text-zinc-500 dark:text-zinc-400">/mo</span></p>
-                  <p className="text-xs text-zinc-400 mb-6">4,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
-                    Subscribe
-                  </button>
-                </div>
-
-                {/* Advanced */}
-                <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6">
-                  <p className="text-sm font-semibold text-zinc-400 mb-4">Advanced</p>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">${getPrice(14.5)}<span className="text-lg text-zinc-500 dark:text-zinc-400">/mo</span></p>
-                  <p className="text-xs text-zinc-400 mb-6">12,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
-                    Subscribe
-                  </button>
-                </div>
-
-                {/* Infinite - Most Popular */}
-                <div className="rounded-xl border border-fuchsia-500/50 bg-white dark:bg-[#18181b] p-6 relative">
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="inline-block rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-1 text-xs font-bold text-white">
-                      MOST POPULAR
-                    </span>
+                {plans.map((plan, index) => (
+                  <div
+                    key={plan._id}
+                    className={
+                      index === 2
+                        ? 'rounded-xl border border-fuchsia-500/50 bg-white dark:bg-[#18181b] p-6 relative'
+                        : index === 3
+                          ? 'rounded-xl border border-lime-500/50 bg-white dark:bg-[#18181b] p-6 relative'
+                          : 'rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6'
+                    }
+                  >
+                    {index === 2 && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span className="inline-block rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-1 text-xs font-bold text-white">
+                          MOST POPULAR
+                        </span>
+                      </div>
+                    )}
+                    {index === 3 && (
+                      <div className="absolute -top-3 right-4">
+                        <span className="inline-block rounded-full bg-lime-500 px-4 py-1 text-xs font-bold text-black">
+                          BEST VALUE
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-sm font-semibold text-zinc-400 mb-4">{getPlanLabel(plan)}</p>
+                    <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">
+                      ${getPrice(plan.price)}
+                      <span className="text-lg text-zinc-500 dark:text-zinc-400">
+                        {plan.recurring ? '/mo' : ''}
+                      </span>
+                    </p>
+                    <p className="text-xs text-zinc-400 mb-6">{getPlanCreditsLabel(plan)}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleSubscribe(plan._id)}
+                      className={
+                      index === 2
+                        ? 'w-full rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white py-2 text-sm font-semibold hover:opacity-90 transition'
+                        : 'w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition'
+                    }
+                    >
+                      Subscribe
+                    </button>
                   </div>
-                  <p className="text-sm font-semibold text-zinc-400 mb-4">Infinite</p>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">${getPrice(28)}<span className="text-lg text-zinc-500 dark:text-zinc-400">/mo</span></p>
-                  <p className="text-xs text-zinc-400 mb-6">24,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white py-2 text-sm font-semibold hover:opacity-90 transition">
-                    Subscribe
-                  </button>
-                </div>
-
-                {/* Wonder - Best Value */}
-                <div className="rounded-xl border border-lime-500/50 bg-white dark:bg-[#18181b] p-6 relative">
-                  <div className="absolute -top-3 right-4">
-                    <span className="inline-block rounded-full bg-lime-500 px-4 py-1 text-xs font-bold text-black">
-                      BEST VALUE
-                    </span>
-                  </div>
-                  <p className="text-sm font-semibold text-zinc-400 mb-4">Wonder</p>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-white mb-1">${getPrice(120)}<span className="text-lg text-zinc-500 dark:text-zinc-400">/mo</span></p>
-                  <p className="text-xs text-zinc-400 mb-6">106,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
-                    Subscribe
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -284,33 +318,27 @@ export function Subscription() {
             <div className="border-b border-white/10 p-8">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-6">Optional Add-ons</h3>
               <div className="grid gap-6 grid-cols-2">
-                {/* Add-on 1 */}
-                <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-semibold text-zinc-400">Extra Credit Pack 1</p>
-                      <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-2">${getPrice(15)}<span className="text-sm text-zinc-500 dark:text-zinc-400">/month</span></p>
+                {addons.map((addon) => (
+                  <div key={addon._id} className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-400">{getPlanLabel(addon)}</p>
+                        <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-2">
+                          ${getPrice(addon.price)}
+                          <span className="text-sm text-zinc-500 dark:text-zinc-400">/month</span>
+                        </p>
+                      </div>
                     </div>
+                    <p className="text-xs text-zinc-400 mb-4">{getAddonCreditsLabel(addon)}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleSubscribe(addon._id)}
+                      className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition"
+                    >
+                      Subscribe
+                    </button>
                   </div>
-                  <p className="text-xs text-zinc-400 mb-4">5,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
-                    Subscribe
-                  </button>
-                </div>
-
-                {/* Add-on 2 */}
-                <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181b] p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm font-semibold text-zinc-400">Extra Credit Pack 2</p>
-                      <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-2">${getPrice(25)}<span className="text-sm text-zinc-500 dark:text-zinc-400">/month</span></p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-zinc-400 mb-4">10,000 credits/month</p>
-                  <button className="w-full rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black py-2 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
-                    Subscribe
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
 

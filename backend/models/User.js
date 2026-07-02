@@ -1,4 +1,4 @@
-//User.js
+//backend/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -11,12 +11,11 @@ const UserSchema = new mongoose.Schema({
   resetPasswordToken: { type: String, default: null },
   resetPasswordExpire: { type: Date, default: null },
   createdAt: { type: Date, default: Date.now },
-  // subscription: {
-  //   plan: { type: String, default: 'free' },
-  //   status: { type: String, default: 'active' },
-  //   credits: { type: Number, default: 30 },
-  //   renewDate: { type: Date }
-  // }
+  credits: { type: Number, default: 0 },
+  activePlan: { type: mongoose.Schema.Types.ObjectId, ref: 'Plan', default: null },
+  purchasedAddons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plan' }],
+  isSubUser: { type: Boolean, default: false },
+  parentUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
 });
 
 UserSchema.pre('save', async function () {

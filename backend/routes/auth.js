@@ -1,4 +1,4 @@
-//auth.js
+//backend/routes/auth.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,6 +7,7 @@ const User = require('../models/User');
 const admin = require('firebase-admin');
 const auth = require('../middleware/auth');
 const sendEmail = require('../utils/sendEmail');
+const { userHasAgencyPlan, applyAgencyReferral } = require('../utils/agencyHelpers');
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ const validatePassword = (password) => {
 router.post('/register', async (req, res) => {
   console.log('Register route hit. Request body:', req.body);
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, ref } = req.body;
 
     // Validation
     if (!name || !email || !password) {
@@ -43,6 +44,7 @@ router.post('/register', async (req, res) => {
     if (user) return res.status(400).json({ message: 'User already exists' });
 
     user = new User({ name, email, password });
+    user = await applyAgencyReferral(user, ref);
     await user.save();
 
     const payload = { user: { id: user.id } };
@@ -84,7 +86,10 @@ router.post('/login', async (req, res) => {
 // Get Current User Profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password -resetPasswordToken');
+    const user = await User.findById(req.user.id)
+      .select('-password -resetPasswordToken -resetPasswordExpire')
+      .populate('activePlan', 'name credits recurring billingCycle features')
+      .populate('purchasedAddons', 'name credits price');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -111,7 +116,8 @@ router.put('/profile', auth, async (req, res) => {
       req.user.id,
       updateData,
       { new: true }
-    ).select('-password -resetPasswordToken');
+    ).select('-password -resetPasswordToken -resetPasswordExpire');
+    //-resetPasswordExpire sensitive fields response me bhejne se bachata hai
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -148,7 +154,8 @@ router.post('/logout', auth, async (req, res) => {
 });
 
 // Forgot Password
-router.post('/forgot-password', auth, async (req, res) => {
+// router.post('/forgot-password', auth, async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -161,10 +168,16 @@ router.post('/forgot-password', auth, async (req, res) => {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
+//before
+    // const user = await User.findById(req.user.id);
+    // if (!user || user.email !== email) {
+    //   return res.status(400).json({ message: 'Please enter your registered email address' });
+    // }
 
-    const user = await User.findById(req.user.id);
-    if (!user || user.email !== email) {
-      return res.status(400).json({ message: 'Please enter your registered email address' });
+    //after
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'No account found with that email' });
     }
 
 
@@ -195,8 +208,8 @@ router.post('/forgot-password', auth, async (req, res) => {
     );
 
     res.json({
-      message: 'Password reset link sent',
-      resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined
+      message: 'Password reset link sent'
+      // resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined
     });
   } catch (err) {
     console.error('Forgot password error:', err);
@@ -254,7 +267,7 @@ if (!admin.apps.length) {
 // Google login/signup route
 router.post('/google', async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, ref } = req.body;
 
     if (!idToken) {
       return res.status(400).json({ message: 'idToken is required' });
@@ -270,19 +283,25 @@ router.post('/google', async (req, res) => {
     if (!user) {
       user = new User({
         email,
-        password: uid, // Google users ka random password
+        password: uid,
         googleId: uid,
         name: name || '',
-        profilePicture: picture || ''
+        profilePicture: picture || '',
       });
+      user = await applyAgencyReferral(user, ref);
       await user.save();
     }
 
-    // Apna JWT banao
+    // my JWT 
+    const secret = process.env.JWT_SECRET;
+    if(!secret) {
+      return res.status(500).json({ message: 'JWT secret is not defined' });
+    }
+
     const payload = { user: { id: user.id } };
     jwt.sign(
       payload,
-      process.env.JWT_SECRET || 'secret',
+      secret,
       { expiresIn: '5h' },
       (err, token) => {
         if (err) throw err;
@@ -292,6 +311,28 @@ router.post('/google', async (req, res) => {
   } catch (err) {
     console.error('Google auth error:', err.message);
     res.status(401).json({ message: 'Invalid Google token', error: err.message });
+  }
+});
+
+// Agency invite link (Fashion Studio Agency plan holders only)
+router.get('/agency/invite', auth, async (req, res) => {
+  try {
+    const agencyPlan = await userHasAgencyPlan(req.user._id || req.user.id);
+    if (!agencyPlan) {
+      return res.status(403).json({ message: 'Agency plan required to generate invite links' });
+    }
+
+    const agencyUserId = req.user._id || req.user.id;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const inviteLink = `${frontendUrl}/signup?ref=${agencyUserId}`;
+
+    return res.json({
+      inviteLink,
+      maxSubUsers: agencyPlan.maxSubUsers,
+      subUserCredits: agencyPlan.subUserCredits,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

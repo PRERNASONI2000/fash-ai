@@ -1,10 +1,13 @@
-//login.tsx
+//frontend/src/pages/Login.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
 import { auth } from '../firebase';
+
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -22,7 +25,7 @@ export function Login() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const token = await user.getIdToken();
-      const response = await fetch('http://localhost:5000/api/auth/google', {
+      const response = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken: token })
@@ -44,7 +47,7 @@ export function Login() {
       setIsSuccess(false);
       setShowModal(true);
       setIsLoading(false);
-    }
+    } 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,7 +55,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -97,7 +100,7 @@ export function Login() {
           <input
             type="email"
             placeholder="you@example.com"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-pink-500 transition-colors"
+            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -105,12 +108,12 @@ export function Login() {
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="block text-sm text-zinc-400">Password</label>
-            <Link to="/forgot-password" className="text-xs text-pink-500 hover:text-pink-400">Forgot password?</Link>
+            <Link to="/forgot-password" className="text-xs text-[#b5652a] hover:text-[#d97a40]">Forgot password?</Link>
           </div>
           <input
             type="password"
             placeholder="••••••••"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-pink-500 transition-colors"
+            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -119,7 +122,7 @@ export function Login() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 text-white font-medium py-3 rounded-lg mt-6 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white font-medium py-3 rounded-lg mt-6 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Signing in...' : 'Sign In'}
         </button>
@@ -150,7 +153,7 @@ export function Login() {
       </button>
 
       <div className="mt-6 text-center text-sm text-zinc-400">
-        Don't have an account? <Link to="/signup" className="text-pink-500 hover:text-pink-400 font-medium">Sign up</Link>
+        Don't have an account? <Link to="/signup" className="text-[#b5652a] hover:text-[#d97a40] font-medium">Sign up</Link>
       </div>
 
       {/* Success/Error Modal */}

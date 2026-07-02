@@ -17,8 +17,10 @@
 //   )
 // }
 
-import { useEffect, useState } from 'react'
 import { Download, Sparkles } from 'lucide-react'
+import { useFetch } from '../hooks/useFetch'
+
+// const API_URL = import.meta.env.VITE_API_URL;
 
 interface Bonus {
   _id: string
@@ -28,23 +30,8 @@ interface Bonus {
 }
 
 export function Bonuses() {
-  const [bonuses, setBonuses] = useState<Bonus[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/bonuses')
-      .then(res => res.json())
-      .then(data => {
-        setBonuses(data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error("Error fetching bonuses:", error)
-        setError('Failed to load bonuses')
-        setLoading(false)
-      })
-  }, [])
+  // ✅ Purani useState/useEffect/fetch logic hata di, sirf 1 line likhi
+  const { data: bonuses, loading, error } = useFetch<Bonus[]>(`${import.meta.env.VITE_API_URL}/api/bonuses`)
 
   if (loading) return (
     <div className="flex justify-center items-center min-h-40 text-zinc-500 animate-pulse">
@@ -62,7 +49,7 @@ export function Bonuses() {
     <section className="mx-auto max-w-6xl px-4 py-8">
       {/* Header Section */}
       <div className="mb-10 text-center md:text-left">
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#b5652a] to-[#d97a40] bg-clip-text text-transparent">
           Exclusive Bonuses
         </h1>
         <p className="mt-2 text-zinc-500 dark:text-zinc-400">
@@ -71,16 +58,16 @@ export function Bonuses() {
       </div>
 
       {/* Grid Layout */}
-      {bonuses.length === 0 ? (
+      {bonuses?.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-500">
           No bonuses available right now. Check back later!
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {bonuses.map(bonus => (
+          {bonuses?.map(bonus => (
             <div
               key={bonus._id}
-              className="group relative flex flex-col rounded-2xl border border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.03] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-violet-500/10 dark:hover:shadow-black/30 hover:-translate-y-1"
+              className="group relative flex flex-col rounded-2xl border border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.03] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[rgba(181,101,42,0.15)] dark:hover:shadow-black/30 hover:-translate-y-1"
             >
               {/* Image Section with Hover Zoom */}
               <div className="relative h-52 w-full overflow-hidden">
@@ -104,7 +91,7 @@ export function Bonuses() {
                   href={bonus.downloadLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-4 py-3 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-violet-500/25 active:scale-95"
+                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white px-4 py-3 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-[rgba(181,101,42,0.35)] active:scale-95"
                 >
                   <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
                   Download Now

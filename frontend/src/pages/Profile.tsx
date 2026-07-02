@@ -1,11 +1,14 @@
 //profile.tsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUserData } from '../hooks/useUserData'; // ✅ Import Custom Hook
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function Profile() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  // ✅ Use Custom Hook
+  const { userData, isLoading: isProfileLoading, error: profileError, setUserData } = useUserData();
+  
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -15,41 +18,10 @@ export function Profile() {
 
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    const fetchProfile = async () => {
-      setIsLoading(true);
-      setError('');
-      try {
-        const response = await fetch('http://localhost:5000/api/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || 'Failed to load profile');
-        }
-        setEmail(data.email || '');
-        setName(data.name || '');
-      } catch (err: any) {
-        setError(err.message || 'Unable to load profile');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [navigate, token]);
-
   const handleSave = async () => {
     setError('');
     setSuccess('');
-    if (!name.trim()) {
+    if (!userData.name.trim()) {
       setError('Name cannot be empty');
       return;
     }
@@ -60,19 +32,19 @@ export function Profile() {
 
     setIsSaving(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/profile', {
+      const response = await fetch(`${API_URL}/api/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: userData.name }),
       });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Unable to save profile');
       }
-      setName(data.user?.name || name);
+      setUserData({ ...userData, name: data.user?.name || userData.name });
       setSuccess('Profile saved successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
@@ -100,7 +72,7 @@ export function Profile() {
     setError('');
     setIsDeleting(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/profile', {
+      const response = await fetch(`${API_URL}/api/auth/profile`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -128,18 +100,18 @@ export function Profile() {
     setShowDeleteModal(false);
   };
 
-  const avatarLetter = email?.trim()?.charAt(0)?.toUpperCase() || 'U';
+  const avatarLetter = userData.email?.trim()?.charAt(0)?.toUpperCase() || 'U';
 
   return (
     <div className="max-w-2xl mx-auto py-8 text-white">
-      {isLoading ? (
+      {isProfileLoading ? (
         <div className="flex min-h-[280px] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-blue-500" />
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#d97a40]" />
         </div>
       ) : (
         <>
           <div className="flex flex-col items-center mb-8">
-            <div className="w-24 h-24 rounded-full bg-blue-500 flex items-center justify-center mb-3">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#b5652a] to-[#d97a40] flex items-center justify-center mb-3 shadow-[0_4px_16px_rgba(181,101,42,0.35)]">
               <span className="text-4xl font-bold text-white">{avatarLetter}</span>
             </div>
             <p className="text-xs text-zinc-400 font-medium">Your profile avatar is based on your email</p>
@@ -148,12 +120,13 @@ export function Profile() {
           <div className="space-y-6">
             {error && <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
             {success && <div className="rounded-lg border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-100">{success}</div>}
+            {profileError && <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{profileError}</div>}
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1 ml-1">Email</label>
               <input
                 type="email"
-                value={email}
+                value={userData.email}
                 readOnly
                 className="w-full bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none"
               />
@@ -163,8 +136,8 @@ export function Profile() {
               <label className="block text-xs text-zinc-400 mb-1 ml-1">Name</label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={userData.name}
+                onChange={(e) => setUserData({ ...userData, name: e.target.value })}
                 className="w-full bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-500"
               />
             </div>
@@ -173,14 +146,14 @@ export function Profile() {
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white font-medium py-3 rounded-lg transition-all shadow-[0_3px_14px_rgba(181,101,42,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
 
             <div className="mt-10 space-y-4">
               <div>
-                <h3 className="text-sm font-medium mb-3">Account</h3>
+                <h3 className="text-sm font-medium mb-3 text-zinc-400">Account</h3>
 
                 <button
                   type="button"
@@ -198,7 +171,7 @@ export function Profile() {
                 </button>
               </div>
               <div>
-                <h3 className="text-sm font-medium mb-3">Danger Zone</h3>
+                <h3 className="text-sm font-medium mb-3 text-zinc-400">Danger Zone</h3>
                 <button
                   type="button"
                   onClick={openDeleteModal}

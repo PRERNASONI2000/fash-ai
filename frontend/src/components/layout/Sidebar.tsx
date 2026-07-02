@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Gift,
   GraduationCap,
+  Image,
   X,
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
@@ -24,15 +25,23 @@ const NAV_MAIN = [
 ] as const
 
 const NAV_TOOLS = [
-  { to: '/generate', label: 'Product to Model', icon: UserCircle2,    end: false },
-  { to: '/generate', label: 'Try On',           icon: Sparkles,        end: false },
-  { to: '/generate', label: 'Create Model',     icon: Zap,             end: false },
-  { to: '/generate', label: 'Swap Model',       icon: RefreshCw,       end: false },
+  { to: '/product-to-model', label: 'Product to Model', icon: UserCircle2,    end: false },
+  { to: '/try-on',           label: 'Try On',           icon: Sparkles,        end: false },
+  { to: '/create-model',     label: 'Create Model',     icon: Zap,             end: false },
+  { to: '/swap-model',       label: 'Swap Model',       icon: RefreshCw,       end: false },
+  { to: '/tryon-v1.6',        label: 'Tryon v1.6',        icon: Sparkles,        end: false },
+  { to: '/edit',             label: 'Edit',             icon: Zap,             end: false },
+  { to: '/image-to-video',   label: 'Image to Video',   icon: RefreshCw,       end: false },
+  { to: '/face-to-model',    label: 'Face to Model',    icon: Sparkles,        end: false },
+  { to: '/reframe',          label: 'Reframe',          icon: Zap,             end: false },
+  { to: '/bg-remove',        label: 'BG Remove',        icon: RefreshCw,       end: false },
 ] as const
 
 const NAV_RESOURCES = [
   { to: '/bonuses',  label: 'Bonuses',          icon: Gift,            end: false },
   { to: '/training', label: 'Training',         icon: GraduationCap,   end: false },
+  { to: '/gallery',   label: 'Gallery',    icon: Image,   end: false },
+  { to: '/support',  label: 'Support',          icon: GraduationCap,   end: false },
 ] as const
 
 // ─── Reusable nav link renderer ────────────────────────────────────────────────
@@ -104,7 +113,7 @@ export function Sidebar({ open, onClose }: Props) {
       {/* ── Nav ──────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         <NavGroup label="Main"      items={NAV_MAIN}      onClose={onClose} />
-        <NavGroup label="AI Tools"  items={NAV_TOOLS}     onClose={onClose} />
+        <NavGroup label="Models"  items={NAV_TOOLS}     onClose={onClose} />
         <NavGroup label="Resources" items={NAV_RESOURCES} onClose={onClose} />
       </nav>
 

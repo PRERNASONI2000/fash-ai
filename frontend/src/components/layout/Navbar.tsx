@@ -1,8 +1,13 @@
+//components/layout/Navbar.tsx
 import { Menu, Moon, Sun, User, CreditCard, History, LogOut, Search, Zap } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
+// import { checkCredits } from '../../lib/fashnService'
 import { NavDropdown } from './NavDropdown'
+import { useUserData } from '../../hooks/useUserData'
+
+// const API_URL = import.meta.env.VITE_API_URL;
 
 const menuItemClass =
   'block w-full px-4 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/5'
@@ -27,31 +32,17 @@ function ProfileDropdown() {
     localStorage.clear()
     navigate('/login')
   }
+  
 
-  const [userData, setUserData] = useState({ name: 'User', email: 'Loading...' })
+    // ✅ Use Custom Hook
+  const { userData } = useUserData();
 
-  useEffect(() => {
-    if (open) {
-      const fetchProfile = async () => {
-        try {
-          const token = localStorage.getItem('token')
-          if (!token) return
-          const res = await fetch('http://localhost:5000/api/auth/profile', {
-            headers: { 'Authorization': `Bearer ${token}` },
-          })
-          if (res.ok) {
-            const data = await res.json()
-            setUserData({ name: data.name || data.email.split('@')[0], email: data.email })
-          }
-        } catch (error) {
-          console.error('Failed to fetch profile', error)
-        }
-      }
-      fetchProfile()
-    }
-  }, [open])
-
-  const { email, name } = userData
+  const { email, name } = userData.name || userData.email 
+    ? { 
+        email: userData.email || 'Loading...', 
+        name: userData.name || userData.email.split('@')[0]
+      } 
+    : { email: 'Loading...', name: 'User' };
 
   return (
     <div ref={ref} className="relative">
@@ -105,6 +96,25 @@ type Props = { onOpenSidebar: () => void }
 export function Navbar({ onOpenSidebar }: Props) {
   const { theme, toggleTheme } = useTheme()
 
+   // ✅ Old checkCredits removed, now using useUserData
+   const { userData } = useUserData();
+   const credits = userData.credits;
+
+//   const [credits, setCredits] = useState<number | null>(null);
+
+// useEffect(() => {
+//   const loadCredits = async () => {
+//     try {
+//       const data = await checkCredits();
+//       setCredits(data.credits.total);
+//     } catch (err) {
+//       console.error('Credit check failed', err);
+//     }
+//   };
+
+//   loadCredits();
+// }, []);
+ 
   return (
     <header className="fash-navbar">
       {/* Left: mobile burger + logo */}
@@ -141,7 +151,7 @@ export function Navbar({ onOpenSidebar }: Props) {
         <div className="fash-credits-pill">
           <Zap size={13} className="fash-credits-icon" />
           <span className="fash-credits-label">CREDITS</span>
-          <span className="fash-credits-value">248/500</span>
+          <span className="fash-credits-value">{credits !== null ? credits : '...'}</span>
         </div>
 
         {/* Upgrade button */}

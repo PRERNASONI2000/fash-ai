@@ -189,7 +189,7 @@ curl -X GET http://localhost:5000/api/auth/profile \
   -H "Authorization: Bearer jwt_token_here"
 
 Response: { "_id": "...", "email": "...", "name": "...", ... }
-```
+```/api/generate
 
 ### 3. Update Profile
 ```bash

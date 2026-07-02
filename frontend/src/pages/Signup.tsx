@@ -1,18 +1,23 @@
-//Signup.tsx
+//frontend/src/pages/Signup.tsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
 import { auth } from '../firebase';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export function Signup() {
   const [name, setName] = useState('');
+  //add loading state if you want same as login.tsx page
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const agencyRef = searchParams.get('ref') || '';
 
   //login with google functionality
   const handleGoogleSignup = async () => {
@@ -23,10 +28,10 @@ export function Signup() {
       //get token from user
       const token = await user.getIdToken();
       //send token to backend
-      const response = await fetch('http://localhost:5000/api/auth/google', {
+      const response = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token })
+        body: JSON.stringify({ idToken: token, ...(agencyRef && { ref: agencyRef }) })
       });
       const data = await response.json();
       console.log('Google signup successful');
@@ -43,14 +48,14 @@ export function Signup() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, ...(agencyRef && { ref: agencyRef }) })
       });
-
+      // BUG: No error check — data.token is undefined if request fails
       const data = await response.json();
-      console.log('Signup response:', data);
+      // console.log('Signup response:', data);
 
       if (!response.ok) {
         throw new Error(data.message || 'Signup failed');
@@ -59,6 +64,7 @@ export function Signup() {
 
       localStorage.setItem('token', data.token);
       setShowSuccess(true);
+      
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong. Please try again.');
@@ -81,7 +87,7 @@ export function Signup() {
             </p>
             <button
               onClick={() => navigate('/')}
-              className="w-full bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 text-white font-medium py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)]"
+              className="w-full bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white font-medium py-3 rounded-xl transition-all shadow-[0_3px_14px_rgba(181,101,42,0.3)] hover:shadow-[0_6px_20px_rgba(181,101,42,0.45)]"
             >
               Continue to Dashboard
             </button>
@@ -106,7 +112,7 @@ export function Signup() {
           <input
             type="text"
             placeholder="Your Name"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-pink-500 transition-colors"
+            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -119,7 +125,7 @@ export function Signup() {
           <input
             type="email"
             placeholder="you@example.com"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-pink-500 transition-colors"
+            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -130,7 +136,7 @@ export function Signup() {
           <input
             type="password"
             placeholder="••••••••"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-pink-500 transition-colors"
+            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -139,7 +145,7 @@ export function Signup() {
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 text-white font-medium py-3 rounded-lg mt-6 transition-all"
+          className="w-full bg-gradient-to-r from-[#b5652a] to-[#d97a40] hover:opacity-90 text-white font-medium py-3 rounded-lg mt-6 transition-all"
         >
           Continue
         </button>
@@ -170,7 +176,7 @@ export function Signup() {
       </button>
 
       <div className="mt-6 text-center text-sm text-zinc-400">
-        Already have an account? <Link to="/login" className="text-pink-500 hover:text-pink-400 font-medium">Sign in</Link>
+        Already have an account? <Link to="/login" className="text-[#b5652a] hover:text-[#d97a40] font-medium">Sign in</Link>
       </div>
     </AuthLayout>
   );
