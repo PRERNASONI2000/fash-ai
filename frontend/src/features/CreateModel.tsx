@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { runGeneration } from "../lib/fashnService";
 import { useNavigate } from "react-router-dom";
-import { Upload, Sparkles, Image as ImageIcon, Loader2, X, Download, Plus, User } from "lucide-react";
+import { Sparkles, Image as ImageIcon, Loader2, X, Download, Plus, User } from "lucide-react";
 
 // File to Base64 helper
 const fileToBase64 = (file: File): Promise<string> => {
@@ -101,8 +101,8 @@ export function CreateModel() {
         throw new Error("No output received from API");
       }
 
-    } catch (err) {
-      if (err.message === 'UPGRADE_REQUIRED') {
+    } catch (err: any) {
+      if (err instanceof Error && err.message === 'UPGRADE_REQUIRED') {
         navigate('/subscriptions'); 
         return;
       }

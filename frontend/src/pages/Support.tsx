@@ -8,7 +8,6 @@ import { MessageCircle, FileText, Lightbulb, HelpCircle, ChevronDown } from 'luc
 
 export function Support() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
-  const [isHovering, setIsHovering] = useState(false)
 
   const faqs = [
     {
@@ -57,29 +56,27 @@ export function Support() {
 
         {/* Support Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {supportSections.map((section, idx) => {
-            const Icon = section.icon
-            return (
-              <div
-                key={idx}
-                onMouseEnter={() => setIsHovering(idx)}
-                onMouseLeave={() => setIsHovering(-1)}
-                className={`group relative p-8 rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm transition-all duration-300 ease-out hover:shadow-xl hover:shadow-[rgba(181,101,42,0.15)] dark:hover:shadow-black/30 hover:border-[#b5652a] dark:hover:border-[#d97a40] hover:-translate-y-1 cursor-pointer`}
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-[#b5652a]/10 to-[#d97a40]/10 dark:from-[#d97a40]/20 dark:to-[#b5652a]/20 group-hover:shadow-lg transition-all duration-300 mb-4">
-                    <Icon className="h-6 w-6 text-[#b5652a] dark:text-[#d97a40]" />
-                  </div>
-                  <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
-                    {section.title}
-                  </h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {section.desc}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
+         {supportSections.map((section, idx) => {
+  const Icon = section.icon
+  return (
+    <div
+      key={idx}
+      className={`group relative p-8 rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm transition-all duration-300 ease-out hover:shadow-xl hover:shadow-[rgba(181,101,42,0.15)] dark:hover:shadow-black/30 hover:border-[#b5652a] dark:hover:border-[#d97a40] hover:-translate-y-1 cursor-pointer`}
+    >
+      <div className="flex flex-col items-center text-center">
+        <div className="p-3 rounded-xl bg-gradient-to-br from-[#b5652a]/10 to-[#d97a40]/10 dark:from-[#d97a40]/20 dark:to-[#b5652a]/20 group-hover:shadow-lg transition-all duration-300 mb-4">
+          <Icon className="h-6 w-6 text-[#b5652a] dark:text-[#d97a40]" />
+        </div>
+        <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
+          {section.title}
+        </h3>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          {section.desc}
+        </p>
+      </div>
+    </div>
+  )
+})}
         </div>
 
         {/* FAQ Section */}

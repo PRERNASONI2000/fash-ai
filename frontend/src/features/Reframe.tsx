@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { runGeneration } from "../lib/fashnService";
-import { Upload, Sparkles, Image as ImageIcon, Loader2, X, Download, Plus } from "lucide-react";
+import { Upload, Image as ImageIcon, Loader2, X, Download, Plus } from "lucide-react";
 
 // File to Base64 helper
 const fileToBase64 = (file: File): Promise<string> => {
@@ -14,7 +14,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 };
 
 // Fixed Credits for Reframe (Adjust as per your pricing)
-const calculateCredits = (res: string) => {
+const calculateCredits = (_res: string) => {
   // Assuming similar cost logic, change if needed
   return 1; // 1 credit for any resolution
 };
@@ -89,8 +89,8 @@ export function Reframe() {
         throw new Error("No output received from API");
       }
 
-    } catch (err) {
-      if (err.message === 'UPGRADE_REQUIRED') {
+    } catch (err: any) {
+      if (err instanceof Error && err.message === 'UPGRADE_REQUIRED') {
         navigate('/subscriptions'); 
         return;
       }

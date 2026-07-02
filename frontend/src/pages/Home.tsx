@@ -21,7 +21,7 @@ import {
 import { fetchHistory } from '../lib/fashnService'; // ✅ Import API
 import { useUserData } from '../hooks/useUserData'; // ✅ Import Custom Hook
 
-const API_URL = import.meta.env.VITE_API_URL
+// const API_URL = import.meta.env.VITE_API_URL
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Template {

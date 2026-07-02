@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { runGeneration } from "../lib/fashnService";
-import { Upload, Shirt, User, Loader2, X, Download, Plus, Sparkles } from "lucide-react";
+import { Shirt, User, Loader2, X, Download, Plus, Sparkles } from "lucide-react";
 
 // File to Base64 helper
 const fileToBase64 = (file: File): Promise<string> => {
@@ -120,8 +120,8 @@ export function TryOn() {
       if (allOutputs.length === 0) throw new Error("No output received");
       setResults(allOutputs);
 
-    } catch (err) {
-      if (err.message === 'UPGRADE_REQUIRED') {
+    } catch (err : any) {
+      if (err instanceof Error && err.message === 'UPGRADE_REQUIRED') {
         navigate('/subscriptions'); 
         return;
       }

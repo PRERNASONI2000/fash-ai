@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { runGeneration } from "../lib/fashnService";
-import { Upload, Shirt, User, Loader2, X, Download, Plus, Zap } from "lucide-react";
+import { Shirt, User, Loader2, X, Download, Plus, Zap } from "lucide-react";
 
 // File to Base64 helper
 const fileToBase64 = (file: File): Promise<string> => {

@@ -1,5 +1,5 @@
 // src/pages/Credit.tsx
-import { History, ArrowDownLeft, ArrowUpRight, Sparkles, Loader2 } from 'lucide-react';
+import { History, ArrowDownLeft, ArrowUpRight, Loader2 } from 'lucide-react';
 import { useFetch } from '../hooks/useFetch';
 import { useUserData } from '../hooks/useUserData';
 

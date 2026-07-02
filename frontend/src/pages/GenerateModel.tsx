@@ -15,7 +15,7 @@ export function GenerateModel() {
     setLoading(true);
     setError(null);
     try {
-      const data = await runGeneration(modelImage, garmentImage);
+      const data = await runGeneration(modelImage, { garmentImage });
       if (data.error) {
         setError(data.error);
       } else {

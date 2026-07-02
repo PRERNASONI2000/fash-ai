@@ -1,5 +1,5 @@
 // src/lib/fashnService.ts
-import { getAuth } from 'firebase/auth';
+// import { getAuth } from 'firebase/auth';
 // export async function runGeneration(modelImage: string, garmentImage: string) {
 //   const response = await fetch("http://localhost:5000/api/fashn-tryon", {
 //     method: "POST",

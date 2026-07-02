@@ -102,8 +102,8 @@ export function Edit() {
         throw new Error("No output received from API");
       }
 
-    } catch (err) {
-      if (err.message === 'UPGRADE_REQUIRED') {
+    } catch (err: any) {
+      if (err instanceof Error && err.message === 'UPGRADE_REQUIRED') {
         navigate('/subscriptions'); 
         return;
       }
