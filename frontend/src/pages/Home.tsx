@@ -142,7 +142,7 @@ const fadeUp : Variants = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function Home() {
-  const [userName, setUserName] = useState<string>('there');
+  const [userName, setUserName] = useState<string>('User');
   const [greeting, setGreeting] = useState<string>('Good morning');
 
   // ✅ Use the custom hook to get user data
@@ -150,6 +150,12 @@ export function Home() {
   
   // ✅ State for Recent Work (Real Data)
   const [recentWork, setRecentWork] = useState<any[]>([]);
+
+  // ✅ Dynamic Plan Stats Calculation
+  const totalPlanCredits = userData?.activePlan?.credits || 0;
+  const currentCredits = userData?.credits || 0;
+  const usedCredits = totalPlanCredits > 0 ? totalPlanCredits - currentCredits : 0;
+  const progressWidth = totalPlanCredits > 0 ? ((usedCredits / totalPlanCredits) * 100).toFixed(1) : '0.0';
 
   useEffect(() => {
     // Time-based greeting
@@ -205,7 +211,7 @@ export function Home() {
         <div className="fash-welcome-left">
           <motion.div variants={fadeUp} custom={0}>
             <p className="fash-greeting-eyebrow">{greeting},</p>
-            <h1 className="fash-greeting-name">{userName} 👋</h1>
+            <h1 className="fash-greeting-name">Hii {userName} 👋</h1>
             <p className="fash-greeting-sub">What would you like to create today?</p>
           </motion.div>
           <motion.div className="fash-cta-row" variants={fadeUp} custom={1}>
@@ -224,23 +230,25 @@ export function Home() {
           <div className="fash-plan-top">
             <div>
               <p className="fash-plan-eyebrow">Your Plan</p>
-              <p className="fash-plan-title">Studio</p>
+              <p className="fash-plan-title">{userData?.activePlan?.name || 'Free'}</p>
             </div>
-            <span className="fash-plan-badge">
-              <Star size={11} />
-              PRO
-            </span>
+            {userData?.activePlan && (
+              <span className="fash-plan-badge">
+                <Star size={11} />
+                PRO
+              </span>
+            )}
           </div>
 
           <div className="fash-plan-stats">
             <div className="fash-stat-item">
-              <span className="fash-stat-num">252</span>
+              <span className="fash-stat-num">{usedCredits}</span>
               <span className="fash-stat-lbl">USED</span>
             </div>
             <div className="fash-stat-divider" />
             <div className="fash-stat-item">
-              <span className="fash-stat-num">18</span>
-              <span className="fash-stat-lbl">THIS WEEK</span>
+              <span className="fash-stat-num">{currentCredits}</span>
+              <span className="fash-stat-lbl">LEFT</span>
             </div>
             <div className="fash-stat-divider" />
             <div className="fash-stat-item">
@@ -251,11 +259,11 @@ export function Home() {
 
           <div className="fash-plan-progress">
             <div className="fash-progress-bar">
-              <div className="fash-progress-fill" style={{ width: '50.4%' }} />
+              <div className="fash-progress-fill" style={{ width: `${progressWidth}%` }} />
             </div>
             <div className="fash-progress-labels">
-              <span>248 credits used</span>
-              <span>500 total</span>
+              <span>{usedCredits} credits used</span>
+              <span>{totalPlanCredits} total</span>
             </div>
           </div>
 

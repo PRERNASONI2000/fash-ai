@@ -4,13 +4,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 // import { checkCredits } from '../../lib/fashnService'
-import { NavDropdown } from './NavDropdown'
+// import { NavDropdown } from './NavDropdown'
 import { useUserData } from '../../hooks/useUserData'
 
 // const API_URL = import.meta.env.VITE_API_URL;
 
-const menuItemClass =
-  'block w-full px-4 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/5'
+// const menuItemClass =
+//   'block w-full px-4 py-2.5 text-left text-sm text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/5'
 
 // ─── Profile Dropdown (backend/auth unchanged) ────────────────────────────────
 function ProfileDropdown() {
@@ -60,7 +60,7 @@ function ProfileDropdown() {
           role="menu"
           className="fash-profile-menu"
         >
-          <div className="fash-profile-header">
+          <div className="fash-profile-header overflow-hidden transition-all duration-300 ease-in-out max-h-24 opacity-100 lg:max-h-0 lg:opacity-0 lg:p-0 lg:pointer-events-none">
             <div className="fash-profile-avatar">
               <User size={18} />
             </div>
@@ -171,14 +171,14 @@ export function Navbar({ onOpenSidebar }: Props) {
 
         <ProfileDropdown />
 
-        <NavDropdown label="Signup">
+        {/* <NavDropdown label="Signup">
           <Link to="/signup" role="menuitem" className={menuItemClass}>
             Create account
           </Link>
           <Link to="/login" role="menuitem" className={menuItemClass}>
             Sign in
           </Link>
-        </NavDropdown>
+        </NavDropdown> */}
       </div>
     </header>
   )

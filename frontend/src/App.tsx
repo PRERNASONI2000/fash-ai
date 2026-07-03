@@ -1,5 +1,5 @@
-//App.tsx
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+// App.tsx — route-level auth gate (JWT in localStorage)
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { ThemeProvider } from './context/ThemeContext'
 import { Bonuses } from './pages/Bonuses'
@@ -27,12 +27,39 @@ import { FacetoModel } from './features/FacetoModel'
 import { Reframe } from './features/Reframe'
 import { BackgroundRemove } from './features/BGRemove'
 
+/** Paths reachable without a JWT in localStorage. */
+const PUBLIC_PATHS = ['/login', '/signup', '/forgot-password'] as const
+
+function isPublicRoute(pathname: string): boolean {
+  return (
+    PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`)) ||
+    pathname.startsWith('/reset-password')
+  )
+}
+
+/** Redirects unauthenticated users to /login; public auth pages are exempt. */
+function RequireAuth() {
+  const token = localStorage.getItem('token')
+  const location = useLocation()
+
+  if (!token && !isPublicRoute(location.pathname)) {
+    return <Navigate to="/login" replace state={{ from: location }} />
+  }
+
+  return <Outlet />
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<Layout />}>
+          <Route element={<RequireAuth />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/bonuses" element={<Bonuses />} />
             <Route path="/gallery" element={<Gallery />} />
@@ -50,14 +77,11 @@ export default function App() {
             <Route path="/bg-remove" element={<BackgroundRemove />} />
             {/* <Route path="/generate" element={<GenerateModel />} /> */}
             <Route path="/settings" element={<Settings />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/subscriptions" element={<Subscription />} />
             <Route path="/credits" element={<Credit />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

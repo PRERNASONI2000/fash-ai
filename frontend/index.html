@@ -10,6 +10,20 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
       rel="stylesheet"
     />
+    <!-- Redirect unauthenticated users before React hydrates (avoids dashboard flash). -->
+    <script>
+      (function () {
+        var path = window.location.pathname;
+        var isPublic =
+          path === '/login' ||
+          path === '/signup' ||
+          path === '/forgot-password' ||
+          path.indexOf('/reset-password') === 0;
+        if (!localStorage.getItem('token') && !isPublic) {
+          window.location.replace('/login');
+        }
+      })();
+    </script>
     <title>VeoGen — AI Image to Video</title>
   </head>
   <body>
