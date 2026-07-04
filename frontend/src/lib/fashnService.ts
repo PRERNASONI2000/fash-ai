@@ -11,6 +11,8 @@
 
 const API_URL = import.meta.env.VITE_API_URL
 
+let historyCache: any = null;
+
 
 // Credits check karne ka function
 export async function checkCredits() {
@@ -21,15 +23,32 @@ export async function checkCredits() {
 
 // History fetch karne ka function
 export async function fetchHistory() {
+  // Cache available hai to wahi return karo
+  if (historyCache) {
+    return historyCache;
+  }
+
   const response = await fetch(`${API_URL}/api/fashn/history`, {
     headers: {
-      ...(localStorage.getItem('token') && {  
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    })
-  }
+      ...(localStorage.getItem("token") && {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }),
+    },
   });
+
   if (!response.ok) throw new Error("Failed to fetch history");
-  return await response.json();
+
+  const data = await response.json();
+
+  // Cache me save
+  historyCache = data;
+
+  return data;
+}
+
+
+export function clearHistoryCache() {
+  historyCache = null;
 }
 
 // Latest result fetch karne ka function
@@ -71,7 +90,7 @@ export async function runGeneration(
   throw new Error(errMsg);
 }
 
-  
+  clearHistoryCache();
 
   return data; // { success: true, output: ["url1", "url2"], credits_used: 2 }
 }

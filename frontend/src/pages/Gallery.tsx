@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { fetchHistory } from "../lib/fashnService";
 import { Image as ImageIcon, Loader2, Download, X, Play } from "lucide-react";
 
+
 export function Gallery() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ export function Gallery() {
   // Export Modal States
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportImageUrl, setExportImageUrl] = useState<string>("");
-  const [exportFormat, setExportFormat] = useState("png");
+  const [exportFormat, setExportFormat] = useState("png"); 
   const [exportQuality, setExportQuality] = useState(95);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export function Gallery() {
         const data = await fetchHistory();
         if (data.history && data.history.length > 0) {
           setHistory(data.history);
-        }
+        } 
       } catch (err) {
         console.error("Failed to load history");
       } finally {
