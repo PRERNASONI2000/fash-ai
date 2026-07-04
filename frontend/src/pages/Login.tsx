@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
 import { useAuth } from '../context/AuthContext';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+// import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
 import { auth } from '../firebase';
 
@@ -20,39 +20,7 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    setIsLoading(true);
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const token = await user.getIdToken();
-      const response = await fetch(`${API_URL}/api/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Google login failed');
-      }
-      console.log('Google login successful');
-      // localStorage.setItem('token', data.token);
-      await login(data.token);
-      setMessage('Sign in successful! Redirecting...');
-      setIsSuccess(true);
-      setShowModal(true);
-      setIsLoading(false);
-      // setTimeout(() => navigate('/'), 2000);
-      navigate('/');
-    } catch (err: any) {
-      console.error(err);
-      setMessage(err.message || 'Something went wrong. Please try again.');
-      setIsSuccess(false);
-      setShowModal(true);
-      setIsLoading(false);
-    } 
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

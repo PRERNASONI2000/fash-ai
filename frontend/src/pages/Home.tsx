@@ -148,7 +148,7 @@ export function Home() {
 
   // ✅ Use the custom hook to get user data
   // const { userData } = useUserData();
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   // ✅ State for Recent Work (Real Data)
   const [recentWork, setRecentWork] = useState<any[]>([]);
 
