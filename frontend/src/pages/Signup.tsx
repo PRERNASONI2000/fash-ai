@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
 import { useAuth } from '../context/AuthContext';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+// import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
-import { auth } from '../firebase';
+// import { auth } from '../firebase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -22,29 +22,29 @@ export function Signup() {
   const agencyRef = searchParams.get('ref') || '';
 
   //login with google functionality
-  const handleGoogleSignup = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      //get token from user
-      const token = await user.getIdToken();
-      //send token to backend
-      const response = await fetch(`${API_URL}/api/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token, ...(agencyRef && { ref: agencyRef }) })
-      });
-      const data = await response.json();
-      console.log('Google signup successful');
-      // localStorage.setItem('token', data.token);
-      await login(data.token);
-      setShowSuccess(true);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Something went wrong. Please try again.');
-    }
-  }
+  // const handleGoogleSignup = async () => {
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     //get token from user
+  //     const token = await user.getIdToken();
+  //     //send token to backend
+  //     const response = await fetch(`${API_URL}/api/auth/google`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ idToken: token, ...(agencyRef && { ref: agencyRef }) })
+  //     });
+  //     const data = await response.json();
+  //     console.log('Google signup successful');
+  //     // localStorage.setItem('token', data.token);
+  //     await login(data.token);
+  //     setShowSuccess(true);
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     setError(err.message || 'Something went wrong. Please try again.');
+  //   }
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,7 +164,7 @@ export function Signup() {
         </div>
       </div>
 
-      <button
+      {/* <button
         type="button"
         // onClick={() => alert('Google Sign-in coming soon!')}
         onClick={handleGoogleSignup}
@@ -177,7 +177,7 @@ export function Signup() {
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
         </svg>
         Continue with Google
-      </button>
+      </button> */}
 
       <div className="mt-6 text-center text-sm text-zinc-400">
         Already have an account? <Link to="/login" className="text-[#b5652a] hover:text-[#d97a40] font-medium">Sign in</Link>

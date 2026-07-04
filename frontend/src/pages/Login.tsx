@@ -5,7 +5,7 @@ import { AuthLayout } from '../components/AuthLayout';
 import { useAuth } from '../context/AuthContext';
 // import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
-import { auth } from '../firebase';
+// import { auth } from '../firebase';
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
