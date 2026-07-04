@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
+import { useAuth } from '../context/AuthContext';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
 import { auth } from '../firebase';
@@ -10,6 +11,7 @@ import { auth } from '../firebase';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function Login() {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -35,12 +37,14 @@ export function Login() {
         throw new Error(data.message || 'Google login failed');
       }
       console.log('Google login successful');
-      localStorage.setItem('token', data.token);
+      // localStorage.setItem('token', data.token);
+      await login(data.token);
       setMessage('Sign in successful! Redirecting...');
       setIsSuccess(true);
       setShowModal(true);
       setIsLoading(false);
-      setTimeout(() => navigate('/'), 2000);
+      // setTimeout(() => navigate('/'), 2000);
+      navigate('/');
     } catch (err: any) {
       console.error(err);
       setMessage(err.message || 'Something went wrong. Please try again.');
@@ -68,12 +72,15 @@ export function Login() {
         throw new Error(data.message || 'Login failed');
       }
 
-      localStorage.setItem('token', data.token);
+      // localStorage.setItem('token', data.token);
+      await login(data.token);
       setMessage('Sign in successful! Redirecting...');
       setIsSuccess(true);
       setShowModal(true);
       setIsLoading(false);
-      setTimeout(() => navigate('/'), 2000);
+      // setTimeout(() => navigate('/'), 2000);
+      //Iski wajah se 2 second tak modal khula rehta hai aur profile fetch background me hoti rehti hai.
+      navigate('/');
     } catch (err: any) {
       console.error(err);
       setMessage(err.message || 'Something went wrong. Please try again.');

@@ -14,6 +14,7 @@ import { Login } from './pages/Login'
 import { Subscription } from './pages/Subscription'
 import { Credit } from './pages/Credit'
 import { ForgotPassword } from './pages/ForgotPassword'
+import { AuthProvider } from './context/AuthContext'
 import { ResetPassword } from './pages/ResetPassword'
 import { Support } from './pages/Support'
 import { ProductToModel } from './features/ProductToModel'
@@ -52,7 +53,8 @@ function RequireAuth() {
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           <Route element={<RequireAuth />}>
             <Route path="/login" element={<Login />} />
@@ -85,6 +87,7 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+        </AuthProvider>
     </ThemeProvider>
   )
 }

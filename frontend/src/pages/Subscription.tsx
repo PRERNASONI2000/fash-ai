@@ -2,7 +2,8 @@
 import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Shield, Sparkles, FileText, ChevronDown } from 'lucide-react';
-import { useUserData } from '../hooks/useUserData';
+// import { useUserData } from '../hooks/useUserData';
+import { useAuth } from '../context/AuthContext';
 import { useFetch } from '../hooks/useFetch';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -24,20 +25,21 @@ interface PlansResponse {
 }
 
 export function Subscription() {
-  const { userData, isLoading, error } = useUserData();
+  const { user, isLoading, error } = useAuth();
+  // const { userData, isLoading, error } = useUserData();
   const { data: plansData, loading: plansLoading, error: plansError } = useFetch<PlansResponse>(`${API_URL}/api/plans`);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   // const navigate = useNavigate();
 
-  const name = userData.name;
+  const name = user?.name;
   const avatarLetter = name?.trim()?.charAt(0)?.toUpperCase() || 'U';
   const workspaceName = name ? `${name}'s Workspace` : 'My Workspace';
-  const currentPlanName = userData.activePlan?.name?.replace('Fashion Studio ', '') || 'Free';
-  const creditsLeft = userData.credits ?? 0;
-  const creditsTotal = userData.activePlan?.credits || creditsLeft || 0;
-  const addonCreditsTotal = userData.purchasedAddons?.reduce((sum, addon) => sum + (addon.credits || 0), 0) ?? 0;
+  const currentPlanName = user?.activePlan?.name?.replace('Fashion Studio ', '') || 'Free';
+  const creditsLeft = user?.credits ?? 0;
+  const creditsTotal = user?.activePlan?.credits || creditsLeft || 0;
+  const addonCreditsTotal = user?.purchasedAddons?.reduce((sum, addon) => sum + (addon.credits || 0), 0) ?? 0;
 
   const getPrice = (monthlyPrice: number) => {
     if (isAnnual) {

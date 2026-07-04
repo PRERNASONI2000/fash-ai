@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
+import { useAuth } from '../context/AuthContext';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
 import { auth } from '../firebase';
@@ -9,6 +10,7 @@ import { auth } from '../firebase';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function Signup() {
+  const { login } = useAuth();
   const [name, setName] = useState('');
   //add loading state if you want same as login.tsx page
   const [email, setEmail] = useState('');
@@ -35,7 +37,8 @@ export function Signup() {
       });
       const data = await response.json();
       console.log('Google signup successful');
-      localStorage.setItem('token', data.token);
+      // localStorage.setItem('token', data.token);
+      await login(data.token);
       setShowSuccess(true);
     } catch (err: any) {
       console.error(err);
@@ -62,7 +65,8 @@ export function Signup() {
 
       }
 
-      localStorage.setItem('token', data.token);
+      // localStorage.setItem('token', data.token);
+      await login(data.token);
       setShowSuccess(true);
       
     } catch (err: any) {

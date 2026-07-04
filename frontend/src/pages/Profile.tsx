@@ -1,13 +1,36 @@
 //profile.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserData } from '../hooks/useUserData'; // ✅ Import Custom Hook
+// import { useUserData } from '../hooks/useUserData'; // ✅ Import Custom Hook
+import { useAuth } from '../context/AuthContext'; // ✅ Import useAuth
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export function Profile() {
   // ✅ Use Custom Hook
-  const { userData, isLoading: isProfileLoading, error: profileError, setUserData } = useUserData();
+ const {
+    user,
+    setUser,
+    logout,
+    isLoading: isProfileLoading,
+    error: profileError,
+}=useAuth();
+
+const [userData, setUserData] = useState({
+    email: user?.email || '',
+    name: user?.name || '',
+  });
+
+  useEffect(() => {
+  if (user) {
+    setUserData({
+      email: user.email,
+      name: user.name,
+    });
+  }
+}, [user]);
+
+  
   
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -16,7 +39,8 @@ export function Profile() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const { token } = useAuth(); // ✅ Get token from useAuth
 
   const handleSave = async () => {
     setError('');
@@ -44,7 +68,16 @@ export function Profile() {
       if (!response.ok) {
         throw new Error(data.message || 'Unable to save profile');
       }
-      setUserData({ ...userData, name: data.user?.name || userData.name });
+      setUser({
+  ...user!,
+  name: data.user?.name || userData.name,
+});
+
+setUserData({
+  ...userData,
+  name: data.user?.name || userData.name,
+});
+      // setUserData({ ...userData, name: data.user?.name || userData.name });
       setSuccess('Profile saved successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
@@ -55,7 +88,8 @@ export function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // localStorage.removeItem('token');
+    logout(); // ✅ Use logout from useAuth
     navigate('/login', { replace: true });
   };
 
@@ -82,7 +116,8 @@ export function Profile() {
       if (!response.ok) {
         throw new Error(data.message || 'Unable to delete account');
       }
-      localStorage.removeItem('token');
+      // localStorage.removeItem('token');
+      logout(); // ✅ Use logout from useAuth
       navigate('/login', { replace: true });
     } catch (err: any) {
       setError(err.message || 'Unable to delete account');
@@ -100,7 +135,11 @@ export function Profile() {
     setShowDeleteModal(false);
   };
 
-  const avatarLetter = userData.email?.trim()?.charAt(0)?.toUpperCase() || 'U';
+  // const avatarLetter = userData.email?.trim()?.charAt(0)?.toUpperCase() || 'U';
+  const avatarLetter =
+  userData.name?.trim()?.charAt(0)?.toUpperCase() ||
+  userData.email?.trim()?.charAt(0)?.toUpperCase() ||
+  'U';
 
   return (
     <div className="max-w-2xl mx-auto py-8 text-white">

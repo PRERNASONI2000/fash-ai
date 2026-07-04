@@ -19,7 +19,8 @@ import {
   X,
 } from 'lucide-react';
 import { fetchHistory } from '../lib/fashnService'; // ✅ Import API
-import { useUserData } from '../hooks/useUserData'; // ✅ Import Custom Hook
+// import { useUserData } from '../hooks/useUserData'; 
+import { useAuth } from '../context/AuthContext';
 
 // const API_URL = import.meta.env.VITE_API_URL
 
@@ -142,18 +143,18 @@ const fadeUp : Variants = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function Home() {
-  const [userName, setUserName] = useState<string>('User');
+  const [userName, setUserName] = useState<string>('');
   const [greeting, setGreeting] = useState<string>('Good morning');
 
   // ✅ Use the custom hook to get user data
-  const { userData } = useUserData();
-  
+  // const { userData } = useUserData();
+  const { user, isLoading } = useAuth();
   // ✅ State for Recent Work (Real Data)
   const [recentWork, setRecentWork] = useState<any[]>([]);
 
   // ✅ Dynamic Plan Stats Calculation
-  const totalPlanCredits = userData?.activePlan?.credits || 0;
-  const currentCredits = userData?.credits || 0;
+  const totalPlanCredits = user?.activePlan?.credits || 0;
+  const currentCredits = user?.credits || 0;
   const usedCredits = totalPlanCredits > 0 ? totalPlanCredits - currentCredits : 0;
   const progressWidth = totalPlanCredits > 0 ? ((usedCredits / totalPlanCredits) * 100).toFixed(1) : '0.0';
 
@@ -165,17 +166,17 @@ export function Home() {
     else setGreeting('Good evening');
 
      // ✅ Use userData from hook
-    if (userData.name || userData.email) {
-      const n: string = userData.name || (userData.email ? (userData.email as string).split('@')[0] : '');
+    if (user?.name || user?.email) {
+      const n: string = user.name || (user.email ? (user.email as string).split('@')[0] : '');
       if (n) setUserName(n.split(' ')[0]);
     }
-  }, [userData]);
+  }, [user]);
 
    
   // ✅ Fetch Real Recent Work (Updated: Wait for userData to load)
   useEffect(() => {
     // Agar userData loading me hai ya null hai, toh API call mat karo
-    if (!userData) return; 
+    if (!user) return; 
 
     const loadRecentWork = async () => {
       try {
@@ -196,7 +197,7 @@ export function Home() {
       }
     };
     loadRecentWork();
-  }, [userData]); // ✅ Dependency me userData daal diya
+  }, [user]); // ✅ Dependency me user daal diya
 
   return (
     <div className="fash-home">
@@ -230,9 +231,9 @@ export function Home() {
           <div className="fash-plan-top">
             <div>
               <p className="fash-plan-eyebrow">Your Plan</p>
-              <p className="fash-plan-title">{userData?.activePlan?.name || 'Free'}</p>
+              <p className="fash-plan-title">{user?.activePlan?.name || 'Free'}</p>
             </div>
-            {userData?.activePlan && (
+            {user?.activePlan && (
               <span className="fash-plan-badge">
                 <Star size={11} />
                 PRO
