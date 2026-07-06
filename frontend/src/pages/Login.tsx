@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/AuthLayout';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 // import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 // @ts-ignore
@@ -11,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function Login() {
+  const [showPassword, setShowPassword] = useState(false)
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -94,13 +96,24 @@ export function Login() {
             <label className="block text-sm text-zinc-400">Password</label>
             <Link to="/forgot-password" className="text-xs text-[#b5652a] hover:text-[#d97a40]">Forgot password?</Link>
           </div>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+         <div className="relative">
+  <input
+    type={showPassword ? 'text' : 'password'}
+    placeholder="••••••••"
+    className="w-full bg-white dark:bg-[#27272a] border border-zinc-200 dark:border-white/5 rounded-lg px-4 py-3 pr-12 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#b5652a] transition-colors"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-500 hover:text-[#b5652a] transition-colors"
+    aria-label={showPassword ? 'Hide password' : 'Show password'}
+  >
+    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+  </button>
+</div>
         </div>
 
         <button
