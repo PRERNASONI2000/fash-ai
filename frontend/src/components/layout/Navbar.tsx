@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 // import { checkCredits } from '../../lib/fashnService'
 // import { NavDropdown } from './NavDropdown'
-import { useUserData } from '../../hooks/useUserData'
+// ✅ Add
+import { useAuth } from '../../context/AuthContext'
 
 // const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,42 +29,42 @@ function ProfileDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleSignOut = () => {
-    localStorage.clear()
-    navigate('/login')
-  }
+ const handleSignOut = () => {
+  logout();
+  navigate('/login', { replace: true });
+}
   
 
-    // ✅ Use Custom Hook
-  const { userData } = useUserData();
+   
+const { user, logout } = useAuth();
 
-  const { email, name } = userData.name || userData.email 
-    ? { 
-        email: userData.email || 'Loading...', 
-        name: userData.name || userData.email.split('@')[0]
-      } 
-    : { email: 'Loading...', name: 'User' };
+const email = user?.email || 'Loading...';
+const name = user?.name || user?.email?.split('@')[0] || 'User';
+
+// Beautiful avatar letter
+const avatarLetter =
+  name.trim().charAt(0).toUpperCase() ||
+  email.trim().charAt(0).toUpperCase() ||
+  'U';
 
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="fash-avatar-btn"
-        aria-expanded={open}
-        aria-haspopup="true"
-      >
-        <User size={18} />
-      </button>
+    <button
+  type="button"
+  onClick={() => setOpen((o) => !o)}
+  className="fash-avatar-btn bg-gradient-to-br from-[#b5652a] to-[#d97a40] text-white font-semibold"
+>
+  {avatarLetter}
+</button>
       {open && (
         <div
           role="menu"
           className="fash-profile-menu"
         >
           <div className="fash-profile-header overflow-hidden transition-all duration-300 ease-in-out max-h-24 opacity-100 lg:max-h-0 lg:opacity-0 lg:p-0 lg:pointer-events-none">
-            <div className="fash-profile-avatar">
-              <User size={18} />
-            </div>
+           <div className="fash-profile-avatar bg-gradient-to-br from-[#b5652a] to-[#d97a40] text-white font-semibold">
+  {avatarLetter}
+</div>
             <div className="overflow-hidden">
               <div className="truncate text-sm font-semibold text-zinc-900 dark:text-white">{name}</div>
               <div className="truncate text-xs text-zinc-500 dark:text-zinc-400">{email}</div>
@@ -97,8 +98,8 @@ export function Navbar({ onOpenSidebar }: Props) {
   const { theme, toggleTheme } = useTheme()
 
    // ✅ Old checkCredits removed, now using useUserData
-   const { userData } = useUserData();
-   const credits = userData.credits;
+  const { user } = useAuth();
+const credits = user?.credits ?? null;
 
 //   const [credits, setCredits] = useState<number | null>(null);
 

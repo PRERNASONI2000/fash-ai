@@ -140,6 +140,8 @@ export function Gallery() {
                     />
                   ) : (
                     <img 
+                      loading="lazy"
+                      decoding="async"
                       src={url} 
                       alt={`Result ${imgIdx + 1}`} 
                       className="w-full h-full object-contain p-1" 

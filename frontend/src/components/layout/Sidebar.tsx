@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+// frontend/src/components/layout/Sidebar.tsx
 import {
   LayoutDashboard,
   LayoutTemplate,
@@ -93,7 +93,7 @@ export function Sidebar({ open, onClose }: Props) {
       aria-label="Sidebar navigation"
     >
       {/* ── Logo ─────────────────────────────────────────── */}
-      <motion.div initial={false} className="fash-sidebar-logo">
+      <div className="fash-sidebar-logo">
         <div className="fash-logo-mark">
           <Sparkles size={18} color="white" />
         </div>
@@ -108,7 +108,7 @@ export function Sidebar({ open, onClose }: Props) {
         >
           <X size={18} />
         </button>
-      </motion.div>
+      </div>
 
       {/* ── Nav ──────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">

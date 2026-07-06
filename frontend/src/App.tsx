@@ -1,32 +1,37 @@
 // App.tsx — route-level auth gate (JWT in localStorage)
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
+import { ScrollToTop } from './components/ScrollToTop'
 import { ThemeProvider } from './context/ThemeContext'
-import { Bonuses } from './pages/Bonuses'
-import { Gallery } from './pages/Gallery'
-// import { GenerateModel } from './pages/GenerateModel'
-import { Home } from './pages/Home'
-import { Profile } from './pages/Profile'
-import { Training } from './pages/Training'
-import { Settings } from './pages/Settings'
-import { Signup } from './pages/Signup'
-import { Login } from './pages/Login'
-import { Subscription } from './pages/Subscription'
-import { Credit } from './pages/Credit'
-import { ForgotPassword } from './pages/ForgotPassword'
 import { AuthProvider } from './context/AuthContext'
-import { ResetPassword } from './pages/ResetPassword'
-import { Support } from './pages/Support'
-import { ProductToModel } from './features/ProductToModel'
-import { TryOn } from './features/TryOn'
-import { SwapModel } from './features/SwapModel'
-import { TryonV16 } from './features/Tryon-v1.6'
-import { Edit } from './features/Edit'
-import { CreateModel } from './features/CreateModel'
-import { ImageToVideo } from './features/ImageToVideo'
-import { FacetoModel } from './features/FacetoModel'
-import { Reframe } from './features/Reframe'
-import { BackgroundRemove } from './features/BGRemove'
+//general imports
+// import { GenerateModel } from './pages/GenerateModel'
+//lazy imports for code splitting
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })))
+const Bonuses = lazy(() => import('./pages/Bonuses').then((m) => ({ default: m.Bonuses })))
+const Gallery = lazy(() => import('./pages/Gallery').then((m) => ({ default: m.Gallery })))
+const Training = lazy(() => import('./pages/Training').then((m) => ({ default: m.Training })))
+const Support = lazy(() => import('./pages/Support').then((m) => ({ default: m.Support })))
+const Signup = lazy(() => import('./pages/Signup').then((m) => ({ default: m.Signup })))
+const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then((m) => ({ default: m.ForgotPassword })))
+const ResetPassword = lazy(() => import('./pages/ResetPassword').then((m) => ({ default: m.ResetPassword })))
+const Credit = lazy(() => import('./pages/Credit').then((m) => ({ default: m.Credit })))
+const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
+const Subscription = lazy(() => import('./pages/Subscription').then((m) => ({ default: m.Subscription })))
+const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
+//lazy imports for features
+const  BackgroundRemove = lazy(() => import('./features/BGRemove').then((m) => ({ default: m.BackgroundRemove })))
+const  CreateModel = lazy(() => import('./features/CreateModel').then((m) => ({ default: m.CreateModel })))
+const  Edit = lazy(() => import('./features/Edit').then((m) => ({ default: m.Edit })))
+const  FacetoModel = lazy(() => import('./features/FacetoModel').then((m) => ({ default: m.FacetoModel })))
+const  ImageToVideo = lazy(() => import('./features/ImageToVideo').then((m) => ({ default: m.ImageToVideo })))
+const  ProductToModel = lazy(() => import('./features/ProductToModel').then((m) => ({ default: m.ProductToModel })))
+const  Reframe = lazy(() => import('./features/Reframe').then((m) => ({ default: m.Reframe })))
+const  SwapModel = lazy(() => import('./features/SwapModel').then((m) => ({ default: m.SwapModel })))
+const  TryOn = lazy(() => import('./features/TryOn').then((m) => ({ default: m.TryOn })))
+const  TryonV16 = lazy(() => import('./features/Tryon-v1.6').then((m) => ({ default: m.TryonV16 })))
 
 /** Paths reachable without a JWT in localStorage. */
 const PUBLIC_PATHS = ['/login', '/signup', '/forgot-password'] as const
@@ -55,6 +60,8 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+        <ScrollToTop />
+        <Suspense fallback={<div className="flex justify-center items-center min-h-40 text-zinc-500 animate-pulse">Loading...</div>}>
         <Routes>
           <Route element={<RequireAuth />}>
             <Route path="/login" element={<Login />} />
@@ -86,6 +93,7 @@ export default function App() {
             </Route>
           </Route>
         </Routes>
+        </Suspense>
       </BrowserRouter>
         </AuthProvider>
     </ThemeProvider>

@@ -1,3 +1,4 @@
+//src/components/layout/Layout.tsx
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Footer } from './Footer'
