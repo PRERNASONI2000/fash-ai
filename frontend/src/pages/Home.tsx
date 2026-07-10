@@ -251,11 +251,11 @@ export function Home() {
               <span className="fash-stat-num">{currentCredits}</span>
               <span className="fash-stat-lbl">LEFT</span>
             </div>
-            <div className="fash-stat-divider" />
+            {/* <div className="fash-stat-divider" />
             <div className="fash-stat-item">
               <span className="fash-stat-num">9</span>
               <span className="fash-stat-lbl">DAYS LEFT</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="fash-plan-progress">
@@ -268,10 +268,10 @@ export function Home() {
             </div>
           </div>
 
-          <div className="fash-plan-footer">
+          {/* <div className="fash-plan-footer">
             <Clock size={12} />
             Renews in 9 days
-          </div>
+          </div> */}
         </motion.div>
       </motion.section>
 

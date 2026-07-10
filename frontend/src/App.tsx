@@ -21,6 +21,7 @@ const Credit = lazy(() => import('./pages/Credit').then((m) => ({ default: m.Cre
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const Subscription = lazy(() => import('./pages/Subscription').then((m) => ({ default: m.Subscription })))
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
+const Template = lazy(() => import('./pages/Template').then((m) => ({ default: m.Template })))
 //lazy imports for features
 const  BackgroundRemove = lazy(() => import('./features/BGRemove').then((m) => ({ default: m.BackgroundRemove })))
 const  CreateModel = lazy(() => import('./features/CreateModel').then((m) => ({ default: m.CreateModel })))
@@ -84,7 +85,7 @@ export default function App() {
             <Route path="/face-to-model" element={<FacetoModel />} />
             <Route path="/reframe" element={<Reframe />} />
             <Route path="/bg-remove" element={<BackgroundRemove />} />
-            {/* <Route path="/generate" element={<GenerateModel />} /> */}
+            <Route path="/generate" element={<Template />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/subscriptions" element={<Subscription />} />
