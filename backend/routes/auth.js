@@ -207,11 +207,11 @@ router.post('/forgot-password', async (req, res) => {
     console.log('Forgot password reset URL:', resetUrl);
 
     try {
-      await sendEmail(
-        user.email, //important for particular email 
-        'Password Reset Request',
-        `You requested a password reset. Click the link to reset your password: ${resetUrl}`
-      );
+      console.log("Before sendEmail");
+
+// await sendEmail(...);
+
+console.log("After sendEmail");
       console.log('Forgot password email sent to:', user.email);
     } catch (emailErr) {
       console.error('Forgot password sendEmail failed:', emailErr);

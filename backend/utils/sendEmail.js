@@ -27,13 +27,13 @@ const sendEmail = async (to, subject, text) => {
   console.log('sendEmail: preparing email to:', to);
   const emailTransporter = getTransporter();
 
-  try {
-    await emailTransporter.verify();
-    console.log('sendEmail: transporter.verify() succeeded');
-  } catch (verifyError) {
-    console.error('sendEmail: transporter.verify() failed:', verifyError);
-    throw new Error(`Email transporter verification failed: ${verifyError.message}`);
-  }
+  // try {
+  //   await emailTransporter.verify();
+  //   console.log('sendEmail: transporter.verify() succeeded');
+  // } catch (verifyError) {
+  //   console.error('sendEmail: transporter.verify() failed:', verifyError);
+  //   throw new Error(`Email transporter verification failed: ${verifyError.message}`);
+  // }
 
   try {
     const info = await emailTransporter.sendMail({

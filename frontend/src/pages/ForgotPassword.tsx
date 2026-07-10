@@ -29,7 +29,7 @@ export function ForgotPassword() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+     const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
