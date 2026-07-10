@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL
 const TOKEN_KEY = 'token' // matches App.tsx / Login.tsx / Signup.tsx / useProfile.ts
 
 /** Mirrors backend/models/User.js (password + reset fields stripped by /api/auth/profile). */

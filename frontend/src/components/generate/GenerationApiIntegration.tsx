@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type SVGProps } from 'react'
 import { glassPanel } from '../../lib/styles'
 import type { GenerationPayload, GenerateApiEnvelope, StatusApiEnvelope } from '../../types/generation'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL
 
 const API_GENERATE = `${API_URL}/api/generate`
 const API_UPLOAD_IMAGE = `${API_URL}/api/upload-image`

@@ -159,57 +159,70 @@ router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
+    console.log('Forgot password route hit. Email:', email);
+
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
     }
-
 
     if (!validateEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-//before
-    // const user = await User.findById(req.user.id);
-    // if (!user || user.email !== email) {
-    //   return res.status(400).json({ message: 'Please enter your registered email address' });
-    // }
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('Forgot password error: missing email configuration', {
+        EMAIL_USER: !!process.env.EMAIL_USER,
+        EMAIL_PASS: !!process.env.EMAIL_PASS,
+      });
+      return res.status(500).json({ message: 'Email configuration error: EMAIL_USER and EMAIL_PASS must be set.' });
+    }
 
-    //after
+    if (!process.env.FRONTEND_URL) {
+      console.warn('Forgot password warning: FRONTEND_URL is not set. Falling back to http://localhost:5173.');
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.warn('Forgot password warning: JWT_SECRET is not set. JWT-based routes may use fallback secret.');
+    }
+
     const user = await User.findOne({ email });
+    console.log('Forgot password user lookup:', { email, found: !!user, userId: user ? user._id : null });
     if (!user) {
       return res.status(400).json({ message: 'No account found with that email' });
     }
 
-
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
-    // Send email with reset instructions
-    //  await sendEmail(
-    //   user.email,
-    //   'Password Reset Request',
-    //   'If you requested a password reset, please click the link below to reset your password. If you did not make this request, you can ignore this email.'
-    // );
+    console.log('Forgot password token generation complete. Token preview:', `${resetToken.slice(0, 8)}...`);
 
     // Save hashed token and expiry to database
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
     await user.save();
+    console.log('Forgot password token saved to database for user:', user._id, 'expiresAt:', user.resetPasswordExpire);
 
     // In development, return reset URL for testing
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    console.log('Forgot password reset URL:', resetUrl);
 
-    await sendEmail(
-      user.email, //important for particular email 
-      // email,
-      'Password Reset Request',
-      `You requested a password reset. Click the link to reset your password: ${resetUrl}`
-    );
+    try {
+      await sendEmail(
+        user.email, //important for particular email 
+        'Password Reset Request',
+        `You requested a password reset. Click the link to reset your password: ${resetUrl}`
+      );
+      console.log('Forgot password email sent to:', user.email);
+    } catch (emailErr) {
+      console.error('Forgot password sendEmail failed:', emailErr);
+      const message = process.env.NODE_ENV === 'development'
+        ? `Email sending failed: ${emailErr.message}`
+        : 'Unable to send password reset email';
+      return res.status(500).json({ message, error: process.env.NODE_ENV === 'development' ? emailErr.message : undefined });
+    }
 
     res.json({
       message: 'Password reset link sent'
-      // resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined
     });
   } catch (err) {
     console.error('Forgot password error:', err);

@@ -6,7 +6,7 @@ import { Shield, Sparkles, FileText, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useFetch } from '../hooks/useFetch';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Plan {
   _id: string;

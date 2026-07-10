@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 // @ts-ignore
 // import { auth } from '../firebase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function Signup() {
   const { login } = useAuth();
