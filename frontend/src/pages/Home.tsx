@@ -10,7 +10,6 @@ import {
   RefreshCw,
   UserCircle2,
   ArrowRight,
-  Clock,
   Star,
   Image as ImageIcon,
   Video,
