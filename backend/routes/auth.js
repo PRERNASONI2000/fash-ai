@@ -169,12 +169,12 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
       console.error('Forgot password error: missing email configuration', {
-        EMAIL_USER: !!process.env.EMAIL_USER,
-        EMAIL_PASS: !!process.env.EMAIL_PASS,
+        SMTP_USER: !!process.env.SMTP_USER,
+        SMTP_PASS: !!process.env.SMTP_PASS,
       });
-      return res.status(500).json({ message: 'Email configuration error: EMAIL_USER and EMAIL_PASS must be set.' });
+      return res.status(500).json({ message: 'Email configuration error: SMTP_USER and SMTP_PASS must be set.' });
     }
 
     if (!process.env.FRONTEND_URL) {

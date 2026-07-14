@@ -27,37 +27,17 @@ const nodemailer = require('nodemailer');
 
 // module.exports = sendEmail;
 
-// const transporter = nodemailer.createTransport({
-//   host: process.env.SMTP_HOST,
-//   port: Number(process.env.SMTP_PORT),
-//   secure: false, // Port 587 uses STARTTLS
-//   auth: {
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   },
-// });
-
-// const sendEmail = async (to, subject, text) => {
-//   await transporter.sendMail({
-//     from: process.env.EMAIL_FROM,
-//     to,
-//     subject,
-//     text,
-//   });
-// };
-
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false, // Port 587 uses STARTTLS
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 const sendEmail = async (to, subject, text) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT),
-    secure: false, // port 587
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to,
