@@ -164,7 +164,7 @@ const credits = user?.credits ?? null;
         <button
           type="button"
           onClick={toggleTheme}
-          className="fash-icon-btn"
+          className="fash-icon-btn flex"
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
