@@ -123,13 +123,13 @@ const credits = user?.credits ?? null;
         <button
           type="button"
           onClick={onOpenSidebar}
-          className="fash-icon-btn lg:hidden"
+          className="fash-icon-btn flex lg:hidden"
           aria-label="Open sidebar"
         >
           <Menu size={19} />
         </button>
 
-        <Link to="/" className="fash-navbar-brand">
+        <Link to="/" className="fash-navbar-brand flex lg:hidden">
           <span className="fash-brand-mark">F</span>
           <span className="hidden sm:inline">FashAI</span>
         </Link>

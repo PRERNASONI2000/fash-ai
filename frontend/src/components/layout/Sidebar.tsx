@@ -103,7 +103,7 @@ export function Sidebar({ open, onClose }: Props) {
         <button
           type="button"
           onClick={onClose}
-          className="fash-sidebar-close lg:hidden"
+          className="fash-sidebar-close flex lg:hidden"
           aria-label="Close sidebar"
         >
           <X size={18} />

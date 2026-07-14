@@ -225,7 +225,18 @@ export function Login() {
                 >
                   Forgot password?
                 </Link>
+
+                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
+    Don't have an account?{" "}
+    <Link
+      to="/signup"
+      className="font-semibold text-[#b5652a] transition-colors hover:text-[#d97a40] dark:text-[#d97a40] dark:hover:text-[#f59e67]"
+    >
+      Sign Up
+    </Link>
+  </p>
               </div>
+              
             </form>
           </div>
         </div>
