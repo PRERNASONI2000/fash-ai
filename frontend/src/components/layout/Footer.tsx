@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 
-const footerLink =
-  'text-sm text-zinc-600 transition hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400'
+// const footerLink =
+//   'text-sm text-zinc-600 transition hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400'
 
 export function Footer() {
   return (
