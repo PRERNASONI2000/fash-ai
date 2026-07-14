@@ -203,15 +203,29 @@ router.post('/forgot-password', async (req, res) => {
     console.log('Forgot password token saved to database for user:', user._id, 'expiresAt:', user.resetPasswordExpire);
 
     // In development, return reset URL for testing
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
-    console.log('Forgot password reset URL:', resetUrl);
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const message = `
+You requested a password reset.
 
+Click the link below to reset your password:
+
+${resetUrl}
+
+If you did not request this, please ignore this email.
+`; 
+    console.log('Forgot password reset URL:', resetUrl); 
+ 
     try {
       console.log("Before sendEmail");
 
-// await sendEmail(...);
+await sendEmail(
+  user.email,
+  "Password Reset Request",
+  message
+);
 
 console.log("After sendEmail");
+
       console.log('Forgot password email sent to:', user.email);
     } catch (emailErr) {
       console.error('Forgot password sendEmail failed:', emailErr);
