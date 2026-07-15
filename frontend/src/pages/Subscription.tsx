@@ -50,13 +50,13 @@ export function Subscription() {
 
   const getPlanLabel = (plan: Plan) => plan.name.replace('Fashion Studio ', '');
 
-  const getPlanCreditsLabel = (plan: Plan) => {
-    if (plan.features?.[0]) return plan.features[0];
-    if (plan.credits > 0) {
-      return plan.recurring ? `${plan.credits} credits/month` : `${plan.credits} credits`;
-    }
-    return plan.features?.join(', ') || '';
-  };
+  // const getPlanCreditsLabel = (plan: Plan) => {
+  //   if (plan.features?.[0]) return plan.features[0];
+  //   if (plan.credits > 0) {
+  //     return plan.recurring ? `${plan.credits} credits/month` : `${plan.credits} credits`;
+  //   }
+  //   return plan.features?.join(', ') || '';
+  // };
 
   const getAddonCreditsLabel = (plan: Plan) => {
     if (plan.features?.[0]) return plan.features[0];
