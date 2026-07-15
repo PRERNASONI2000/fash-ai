@@ -203,7 +203,8 @@ router.post('/forgot-password', async (req, res) => {
     console.log('Forgot password token saved to database for user:', user._id, 'expiresAt:', user.resetPasswordExpire);
 
     // In development, return reset URL for testing
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const baseUrl = process.env.FRONTEND_URL.replace(/\/$/, '');
+    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
     const message = `
 You requested a password reset.
 
